@@ -1,0 +1,99 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins:wght@300;400;500;600;700;800;900&display=swap);
+
+* {
+
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", san-serif;
+}
+
+body {
+
+    justify-content: center;
+    align-items: center;
+}
+.row h2{
+    text-align: center;
+    margin-bottom: 22px;
+    font-size: 30px;
+}
+.main-content{
+	width: 80%;
+	margin: 5em auto;
+	display: flex;
+}
+
+.fa-android{
+	font-size:3em;
+}
+@media screen and (max-width: 640px) {
+	.main-content{width: 90%;}
+	.company__info{
+		display: none;
+	}
+	
+}
+@media screen and (min-width: 642px) and (max-width:800px){
+	.main-content{width: 70%;}
+}
+
+
+.login_form{
+    color: #fff;
+    padding: 50px 50px;
+	background-color: #011B10;
+border-radius: 20px;
+	border:3px solid rgba(0, 255, 128, 0);
+    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    margin-bottom: auto;
+}
+form{
+	padding: 0 2em;
+}
+.form__input{
+	width: 100%;
+	border:0px solid transparent;
+	border-radius: 5px;
+	padding: 1em .5em .5em;
+	padding-left: 2em;
+	outline:none;
+	margin:1em auto;
+    margin-bottom: 1em;
+	transition: all .5s ease;
+}
+.form__input:focus{
+	border-bottom-color: #008080;
+	box-shadow: 0 0 5px rgba(0,80,80,.4); 
+	border-radius: 4px;
+}
+.btn{
+    text-decoration: none;
+    padding: 15px 30px;
+	transition: all .5s ease;
+	border-radius: 30px;
+	color:#011B10;
+	font-weight: 600;
+	background-color: #fff;
+	border: 3px solid #7b9678;;
+    margin-top: 1em;
+    float: right;
+    width: 100%;
+    text-align: center;
+ 
+ 
+}
+
+.btn:hover, .btn:focus{
+	background-color: #b0dfac;
+	color:#011B10;
+}
+
+.footer {
+    text-align: center;
+    background-color:   #7b9678;;
+    padding: 10px 0;
+}
