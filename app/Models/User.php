@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Request;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -73,7 +74,6 @@ class User extends Authenticatable
         $return = $return->orderBy('id','desc')
                         ->paginate(10);
 
-        
         return $return;
     }
 
@@ -85,7 +85,6 @@ class User extends Authenticatable
         $return = $return->OrderBy('users.id','desc')
                         ->get();
 
-        
         return $return;
     }
 
@@ -99,3 +98,5 @@ class User extends Authenticatable
         return User::where('remember_token', '=', $remember_token)->first();
     }
 }
+
+

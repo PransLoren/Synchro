@@ -8,16 +8,15 @@ use Hash;
 use Auth;
 use Mail;
 use Str;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 class WebAuthController extends Controller
 {
-
     public function forgotpassword(){
         return view('Auth.forgotpassword');
     }
 
     public function PostForgotPassword(Request $request){
-        
         $request->validate([
             'email' => 'required|email|exists:users,email',
         ]);
@@ -35,7 +34,6 @@ class WebAuthController extends Controller
         return redirect()->back()->with('success', 'Password reset link has been sent to your email.');
     }
 
-
     public function loginuser(){
         return view("Auth.login");
     }
@@ -45,7 +43,6 @@ class WebAuthController extends Controller
     }
 
     public function login(){
-            
         if(!empty(Auth::check())){
             if(Auth::user()->user_type == 1){
                 return redirect('admin/dashboard');
@@ -63,25 +60,31 @@ class WebAuthController extends Controller
 
         return view('Auth.login');
     }
+
     public function Authlogin(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|min:5|max:20'
-    ]);
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:5|max:20'
+        ]);
 
-    $remember = !empty($request->remember);
+        $remember = !empty($request->remember);
 
-    if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
-        if (Auth::user()->user_type == 1) {
-            return redirect('admin/dashboard');
-        } elseif (Auth::user()->user_type == 3) {
-            return redirect('student/dashboard');
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
+            if (!Auth::user()->hasVerifiedEmail()) {
+                Auth::logout();
+                return redirect()->route('loginuser')->with('warning', 'You need to verify your email address before logging in.');
+            }
+
+            if (Auth::user()->user_type == 1) {
+                return redirect('admin/dashboard');
+            } elseif (Auth::user()->user_type == 3) {
+                return redirect('student/dashboard');
+            }
+        } else {
+            return redirect()->back()->with('fail', 'Incorrect Email or Password');
         }
-    } else {
-        return redirect()->back()->with('fail', 'Incorrect Email or Password');
     }
-}
 
     public function registration(){
         return view("Auth.register");
@@ -102,17 +105,17 @@ class WebAuthController extends Controller
         $user->user_type = 3; 
         $user->save();
 
+        $user->sendEmailVerificationNotification(); // Send verification email
+
         Auth::login($user);
 
-        return redirect('/');
+        return redirect()->route('loginuser');
     }
 
     public function reset($remember_token){
-
         $user = User::getTokenSingle($remember_token);
 
         if(!empty($user)){
-
             $data['user'] = $user;
             $data['token'] = $remember_token;
             return view('Auth.resetpass',$data);
@@ -120,7 +123,6 @@ class WebAuthController extends Controller
         else{
             abort(404);
         }
-
     }
 
     public function PostReset($token, Request $request){
