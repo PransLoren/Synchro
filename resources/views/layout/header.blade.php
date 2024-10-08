@@ -68,6 +68,13 @@
           </li>
 
           <li class="nav-item">
+            <a href="{{url ('student/invitations')}}" class="nav-link @if(Request::segment(2) =='invitations') active @endif" style="color: #EAEAEA;">
+              <i class="nav-icon fas fa-envelope" style="color: #FF6F61;"></i>
+              <p>Pending Invitations</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
             <a href="{{url ('student/profile')}}" class="nav-link @if(Request::segment(2) =='profile') active @endif" style="color: #EAEAEA;">
               <i class="nav-icon far fa-user" style="color: #FF6F61;"></i>
               <p>Profile</p>

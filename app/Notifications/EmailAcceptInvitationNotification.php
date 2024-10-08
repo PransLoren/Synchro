@@ -18,6 +18,7 @@ class EmailAcceptInvitationNotification extends Notification
     public function __construct(ProjectModel $project)
     {
         $this->project = $project;
+        $this->token = $token;
     }
 
     public function via($notifiable)
@@ -27,8 +28,14 @@ class EmailAcceptInvitationNotification extends Notification
 
     public function toMail($notifiable)
     {
+        // Correctly generate the invitation URL with the project ID and token
+        $invitationUrl = url('/projects/' . $this->project->id . '/invitation/' . $this->token . '/accept');
+
         return (new MailMessage)
-            ->subject('Invitation Accepted')
-            ->line('You have accepted the invitation to join the project: ' . $this->project->name);
+            ->subject('Invitation to join a project')
+            ->line('You have been invited to join the project: ' . $this->project->name)
+            ->action('Accept Invitation', $invitationUrl);
     }
+
+
 }

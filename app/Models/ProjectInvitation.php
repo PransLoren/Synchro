@@ -7,5 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProjectInvitation extends Model
 {
-    protected $fillable = ['project_id', 'email'];
+    use HasFactory;
+
+    protected $fillable = ['project_id', 'email', 'status'];
+
+    // Constants for status
+    const STATUS_PENDING = 'pending';
+    const STATUS_ACCEPTED = 'accepted';
+    const STATUS_REJECTED = 'rejected';
+
+    // Define relationship with ProjectModel
+    public function project()
+    {
+        return $this->belongsTo(ProjectModel::class, 'project_id');
+    }
 }

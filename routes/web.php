@@ -24,6 +24,17 @@ Route::post('/forgot-password', [WebAuthController::class, 'PostForgotPassword']
 Route::get('/reset/{token}', [WebAuthController::class, 'reset']);
 Route::post('/reset/{token}', [WebAuthController::class, 'PostReset']);
 
+// Email Verification Routes
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/')->with('success', 'Email verified successfully. Please log in.');
+})->middleware(['signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
 // Profile Routes
 Route::get('/student/profile', [WebAuthController::class, 'profile'])->name('student.profile')->middleware('verified');
 Route::post('/profile/update', [WebAuthController::class, 'update'])->name('profile.update')->middleware('verified');
@@ -74,18 +85,8 @@ Route::group(['middleware' => ['auth', 'student']], function () {
     Route::post('/student/project/view/{projectId}/task/{taskId}/done', [ProjectController::class, 'markTaskAsDone'])->name('done.task');
 
     // Project Invitation Routes
+    Route::get('/student/invitations', [ProjectInvitationController::class, 'showInvitations'])->name('student.invitations');
     Route::post('/projects/{project}/invite', [ProjectInvitationController::class, 'invite'])->name('projects.invite');
-    Route::get('/projects/{project}/accept-invitation', [ProjectInvitationController::class, 'acceptInvitation'])->name('projects.acceptInvitation');
-    Route::post('/projects/{project}/reject-invitation', [ProjectInvitationController::class, 'rejectInvitation'])->name('projects.rejectInvitation');
+    Route::post('/projects/{project}/invitation/accept', [ProjectInvitationController::class, 'acceptInvitation'])->name('projects.acceptInvitation');
+    Route::post('/projects/{project}/invitation/reject', [ProjectInvitationController::class, 'rejectInvitation'])->name('projects.rejectInvitation');
 });
-
-// Email Verification Routes
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/')->with('success', 'Email verified successfully. Please log in.');
-})->middleware(['signed'])->name('verification.verify');
-
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');

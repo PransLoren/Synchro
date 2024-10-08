@@ -30,8 +30,7 @@
           <div class="content">
             <h3>Sign In</h3>
             <p>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Debitis,
-              ex ratione. Aliquid!
+              Palitan mo met
             </p>
             <a href="{{ url ('/')}}">
               <button class="btn transparent" id="sign-up-btn">

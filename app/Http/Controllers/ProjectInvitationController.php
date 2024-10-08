@@ -1,10 +1,10 @@
 <?php
 
-// App\Http\Controllers\ProjectInvitationController.php
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\ProjectModel;
+use App\Models\ProjectInvitation;
 use Illuminate\Http\Request;
 use App\Notifications\EmailProjectInvitationNotification;
 use App\Notifications\EmailAcceptInvitationNotification;
@@ -27,10 +27,27 @@ class ProjectInvitationController extends Controller
             return back()->with('error', 'User with provided email not found.');
         }
 
-        // Check if the user is already invited or a member
+        // Check if the user is already a member
         if ($project->users->contains($user)) {
-            return back()->with('error', 'User is already invited or is a member of this project.');
+            return back()->with('error', 'User is already a member of this project.');
         }
+
+        // Check if there's already a pending invitation
+        $invitation = ProjectInvitation::where('project_id', $project->id)
+            ->where('email', $request->email)
+            ->where('status', ProjectInvitation::STATUS_PENDING)
+            ->first();
+
+        if ($invitation) {
+            return back()->with('error', 'User has already been invited and the invitation is pending.');
+        }
+
+        // Create a new invitation
+        ProjectInvitation::create([
+            'project_id' => $project->id,
+            'email' => $request->email,
+            'status' => ProjectInvitation::STATUS_PENDING,
+        ]);
 
         // Send invitation via email
         $user->notify(new EmailProjectInvitationNotification($project));
@@ -40,30 +57,51 @@ class ProjectInvitationController extends Controller
 
     public function acceptInvitation(ProjectModel $project)
     {
-        // Find the authenticated user
         $user = auth()->user();
+
+        // Find the invitation
+        $invitation = ProjectInvitation::where('project_id', $project->id)
+            ->where('email', $user->email)
+            ->where('status', ProjectInvitation::STATUS_PENDING)
+            ->first();
+
+        if (!$invitation) {
+            return back()->with('error', 'Invalid or expired invitation.');
+        }
 
         // Attach the user to the project
-        $project->users()->attach($user);
+        $project->users()->syncWithoutDetaching([$user->id]);
 
-        // Send notification
-        $user->notify(new EmailAcceptInvitationNotification($project));
+        // Update the invitation status
+        $invitation->update(['status' => ProjectInvitation::STATUS_ACCEPTED]);
 
-        return back()->with('success', 'Invitation accepted successfully!');
+        return redirect()->route('userdashboard')->with('success', 'Invitation accepted successfully!');
     }
 
-    public function rejectInvitation(ProjectModel $project)
+
+
+    public function rejectInvitation(ProjectInvitation $invitation)
     {
-        // Find the authenticated user
-        $user = auth()->user();
+        // Update the invitation status to rejected
+        $invitation->update(['status' => ProjectInvitation::STATUS_REJECTED]);
 
-        // Detach the user from the project
-        $project->users()->detach($user);
+        // Optional: Notify the user
+        $user = User::where('email', $invitation->email)->first();
+        if ($user) {
+            $user->notify(new EmailRejectInvitationNotification($invitation->project));
+        }
 
-        // Send notification
-        $user->notify(new EmailRejectInvitationNotification($project));
-
-        return back()->with('success', 'Invitation rejected successfully!');
+        return redirect()->route('student.dashboard')->with('success', 'Invitation rejected successfully.');
     }
-}
 
+    public function showInvitations()
+    {
+        $user = auth()->user();
+        $invitations = ProjectInvitation::where('email', $user->email)
+                                        ->where('status', ProjectInvitation::STATUS_PENDING)
+                                        ->get();
+        
+        return view('invitations.index', compact('invitations'));
+    }
+
+}

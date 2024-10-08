@@ -15,21 +15,22 @@ class DashboardController extends Controller
 
         // Check the user type
         if (Auth::user()->user_type == 1) {
-            // If the user is a student
+            // If the user is an admin
             $data['getStudent'] = User::getStudent();
             $data['getAdmin'] = User::getAdmin();
             $data['getRecord'] = ProjectModel::getRecord();
-            $data['header_title'] = "Dashboard";
             return view('Admin.admindash', $data);
         } elseif (Auth::user()->user_type == 3) {
-            // If the user is a student
-            // Fetch projects associated with the logged-in user
+            // If the user is a student, fetch both created and member projects
             $userId = Auth::id();
             $data['userProjects'] = ProjectModel::where('created_by', $userId)
-                                    ->orderBy('id', 'desc')
-                                    ->paginate(10);
-            $data['header_title'] = 'Project';
+                ->orWhereHas('users', function($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->orderBy('id', 'desc')
+                ->paginate(10);
             return view('Student.studentdash', $data);
         }
     }
+
 }

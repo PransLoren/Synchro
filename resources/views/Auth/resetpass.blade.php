@@ -34,8 +34,7 @@
           <div class="content">
             <h3>Sign In</h3>
             <p>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Debitis,
-              ex ratione. Aliquid!
+              palitan mo met
             </p>
             <a href="">
               <button class="btn transparent" id="sign-up-btn">

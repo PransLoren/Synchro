@@ -21,6 +21,11 @@ class ProjectModel extends Model
         return $this->hasMany(Task::class, 'project_id');
     }
 
+    public function invitations()
+    {
+        return $this->hasMany(ProjectInvitation::class, 'project_id');
+    }
+
     static public function getSingle($id)
     {
         return self::find($id);
@@ -39,10 +44,9 @@ class ProjectModel extends Model
 
     public function getDocument()
     {
-        if(!empty($this->document_file) && file_exists('upload/project/' . $this->document_file)){
+        if (!empty($this->document_file) && file_exists('upload/project/' . $this->document_file)) {
             return url('upload/project/' . $this->document_file);
-        }
-        else{
+        } else {
             return "";
         }
     }
