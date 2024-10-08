@@ -31,20 +31,20 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function projects()
     {
-        return $this->belongsToMany(ProjectModel::class, 'project_user', 'user_id', 'project_id');
+        return $this->belongsToMany(ProjectModel::class, 'project_user', 'user_id', 'project_id')
+                    ->where('is_delete', '=', 0);
     }
 
-    public function teacherStudents()
+    public static function getSingle($id)
     {
-        return $this->hasMany(AssignSubjectApiTeacher::class, 'teacher_id', 'id');
+        $user = self::find($id);
+        if (!$user) {
+            throw new \Exception("User not found.");
+        }
+        return $user;
     }
 
-    static public function getSingle($id)
-    {
-        return self::find($id);
-    }
-
-    static public function getAdmin()
+    public static function getAdmin()
     {
         $query = self::query()->where('user_type', 1)->where('is_delete', 0);
         if (!empty(Request::get('email'))) {
@@ -53,7 +53,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $query->orderBy('id', 'desc')->paginate(10);
     }
 
-    static function getTeacherStudent($teacher_id)
+    public static function getTeacherStudent($teacher_id)
     {
         return self::select('users.*', 'subject.name as subject_name')
             ->join('assign_subject_teacher', 'assign_subject_teacher.teacher_id', '=', 'users.id')
@@ -66,37 +66,39 @@ class User extends Authenticatable implements MustVerifyEmail
             ->paginate(20);
     }
     
-    static function getStudent()
+    public static function getStudent()
     {
         $return = User::select('users.*')
-                        ->where('user_type','=',3)
-                        ->where('is_delete','=',0);
-        $return = $return->orderBy('id','desc')
-                        ->paginate(10);
-
-        return $return;
+                        ->where('user_type', '=', 3)
+                        ->where('is_delete', '=', 0);
+        return $return->orderBy('id', 'desc')
+                      ->paginate(10);
     }
 
-    static function getTeacherClass()
+    public static function getTeacherClass()
     {
         $return = User::select('users.*')
-                        ->where('user_type','=',2)
-                        ->where('is_delete','=',0);
-        $return = $return->OrderBy('users.id','desc')
-                        ->get();
-
-        return $return;
+                        ->where('user_type', '=', 2)
+                        ->where('is_delete', '=', 0);
+        return $return->orderBy('users.id', 'desc')
+                      ->get();
     }
 
-    static public function getEmailSingle($email)
+    public static function getEmailSingle($email)
     {
-        return User::where('email', '=', $email)->first();
+        $user = User::where('email', '=', $email)->first();
+        if (!$user) {
+            throw new \Exception("User not found with the provided email.");
+        }
+        return $user;
     }
 
-    static public function getTokenSingle($remember_token)
+    public static function getTokenSingle($remember_token)
     {
-        return User::where('remember_token', '=', $remember_token)->first();
+        $user = User::where('remember_token', '=', $remember_token)->first();
+        if (!$user) {
+            throw new \Exception("User not found with the provided token.");
+        }
+        return $user;
     }
 }
-
-

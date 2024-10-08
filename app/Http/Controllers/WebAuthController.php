@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Mail\ForgotPasswordMail;
@@ -12,11 +13,13 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 class WebAuthController extends Controller
 {
-    public function forgotpassword(){
+    public function forgotpassword()
+    {
         return view('Auth.forgotpassword');
     }
 
-    public function PostForgotPassword(Request $request){
+    public function PostForgotPassword(Request $request)
+    {
         $request->validate([
             'email' => 'required|email|exists:users,email',
         ]);
@@ -34,26 +37,26 @@ class WebAuthController extends Controller
         return redirect()->back()->with('success', 'Password reset link has been sent to your email.');
     }
 
-    public function loginuser(){
+    public function loginuser()
+    {
         return view("Auth.login");
     }
 
-    public function profile(){
+    public function profile()
+    {
         return view("Student.studentProfile");
     }
 
-    public function login(){
-        if(!empty(Auth::check())){
-            if(Auth::user()->user_type == 1){
+    public function login()
+    {
+        if (!empty(Auth::check())) {
+            if (Auth::user()->user_type == 1) {
                 return redirect('admin/dashboard');
-            }
-            elseif(Auth::user()->user_type == 2){
+            } elseif (Auth::user()->user_type == 2) {
                 return redirect('teacher/dashboard');
-            }
-            elseif(Auth::user()->user_type == 3){
+            } elseif (Auth::user()->user_type == 3) {
                 return redirect('student/dashboard');
-            }
-            elseif(Auth::user()->user_type == 4){
+            } elseif (Auth::user()->user_type == 4) {
                 return redirect('manager/dashboard');
             }
         }
@@ -86,7 +89,8 @@ class WebAuthController extends Controller
         }
     }
 
-    public function registration(){
+    public function registration()
+    {
         return view("Auth.register");
     }
 
@@ -98,44 +102,54 @@ class WebAuthController extends Controller
             'password' => 'required|string|min:5|max:20|confirmed',
         ]);
 
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = bcrypt($request->password);
-        $user->user_type = 3; 
-        $user->save();
+        try {
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = bcrypt($request->password);
+            $user->user_type = 3; 
+            $user->save();
 
-        $user->sendEmailVerificationNotification(); // Send verification email
+            // Safeguard against sending verification if the user wasn't created properly
+            if ($user) {
+                $user->sendEmailVerificationNotification(); // Send verification email
+            }
 
-        Auth::login($user);
-
-        return redirect()->route('loginuser');
+            return redirect()->route('loginuser')->with('success', 'Registration successful. Please check your email to verify your account.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Registration failed: ' . $e->getMessage());
+        }
     }
 
-    public function reset($remember_token){
+    public function reset($remember_token)
+    {
         $user = User::getTokenSingle($remember_token);
 
-        if(!empty($user)){
+        if ($user) {
             $data['user'] = $user;
             $data['token'] = $remember_token;
-            return view('Auth.resetpass',$data);
-        }
-        else{
-            abort(404);
+            return view('Auth.resetpass', $data);
+        } else {
+            return redirect()->route('forgotpassword')->with('error', 'Invalid or expired reset token.');
         }
     }
 
-    public function PostReset($token, Request $request){
-        if($request->password == $request->cpassword){
-            $user = User::getTokenSingle($token);
+    public function PostReset($token, Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string|min:5|max:20|confirmed',
+        ]);
+
+        $user = User::getTokenSingle($token);
+
+        if ($user) {
             $user->password = Hash::make($request->password);
             $user->remember_token = Str::random(30);
             $user->save();
 
             return redirect(url('/'))->with('success', 'Password successfully reset');
-        }
-        else{
-            return redirect()->back()->with('error', 'Password does not match');
+        } else {
+            return redirect()->back()->with('error', 'Invalid token or user not found.');
         }
     }
 
@@ -161,7 +175,8 @@ class WebAuthController extends Controller
         return redirect()->route('student.profile')->with('success', 'Profile updated successfully!');
     }
 
-    public function logout(){
+    public function logout()
+    {
         Auth::logout();
         return redirect(url(''));
     }

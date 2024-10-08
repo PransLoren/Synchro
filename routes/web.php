@@ -11,9 +11,9 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectInvitationController;
 
-// Public Routes
 Route::get('/', [WebAuthController::class, 'loginuser'])->name('loginuser');  // Shows login form
 Route::get('/registration', [WebAuthController::class, 'registration'])->name('registration');
+Route::get('/login', [WebAuthController::class, 'loginuser'])->name('loginuser'); // Show login form
 Route::post('/login', [WebAuthController::class, 'Authlogin'])->name('login'); // Handles login
 Route::post('/register', [WebAuthController::class, 'register'])->name('register');
 Route::get('/logout', [WebAuthController::class, 'logout'])->name('logout');
@@ -25,8 +25,25 @@ Route::get('/reset/{token}', [WebAuthController::class, 'reset']);
 Route::post('/reset/{token}', [WebAuthController::class, 'PostReset']);
 
 // Email Verification Routes
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    // Find the user by ID
+    $user = \App\Models\User::find($id);
+
+    // Check if user exists
+    if (!$user) {
+        return redirect('/')->with('error', 'Invalid verification link.');
+    }
+
+    // Verify the hash matches the user's email hash
+    if (!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+        return redirect('/')->with('error', 'Invalid verification link.');
+    }
+
+    // Mark the user as verified
+    $user->email_verified_at = now();
+    $user->save();
+
+    // Redirect to login page with success message
     return redirect('/')->with('success', 'Email verified successfully. Please log in.');
 })->middleware(['signed'])->name('verification.verify');
 
