@@ -56,11 +56,17 @@
                             <input type="text" class="form-control" name="class_name" id="getproject" value="{{ $getRecord->project->name ?? '' }}" >
                         </div>
 
-                          <!-- Removed Project Date Field -->
+            
 
                           <div class="form-group">
                             <label>Submission Date <span style="color:red">*</span></label>
                             <input type="date" class="form-control" name="submission_date" required id="submission_date">
+                          </div>
+                          
+                          <!-- Added Submission Time Field -->
+                          <div class="form-group">
+                            <label>Submission Time <span style="color:red">*</span></label>
+                            <input type="time" class="form-control" name="submission_time" required id="submission_time">
                           </div>
 
                           <div class="form-group">

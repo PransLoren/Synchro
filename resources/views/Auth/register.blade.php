@@ -10,10 +10,14 @@
   <body>
     <div class="container">
       <div class="forms-container">
+      
         <div class="signin-signup">
         <form action="{{ route('register') }}" method="POST" class="sign-in-form">
           @csrf
-          <h2 class="title">Register</h2>
+
+          <img src="uploads/project/logo.png" alt="Your Image" style="height: 19.6vw; width: auto; margin-top: -10rem" />
+
+          <h2 class="title2">Register</h2>
           @if ($errors->any())
               <div class="alert alert-danger">
                   <ul>
@@ -47,17 +51,29 @@
       <div class="panels-container">
         <div class="panel left-panel">
           <div class="content">
-            <h3>One of Us?</h3>
+            <!-- <h3>One of Us?</h3>
             <p>
             Embark on a personalized journey through our website's exclusive content – Log in now to explore and access a diverse range of unique experiences    
-          </p>
+          </p> -->
             <a href="{{url('/')}}">
               <button class="btn transparent" id="sign-up-btn">
                 Sign In
               </button>
             </a>
           </div>
-          <img src="{{url('assets/adminassets/dist/img/Syncologo.png')}}" class="image" alt="" />
+          <img src="uploads/project/WW.png" alt="Your Image" class="styled-image" /> 
+             <button class="btnf1" >
+                    Progress at a glance
+             </button>
+             <button class="btnf2" >
+             Keep your project on point
+             </button>
+             <button class="btnf3" >
+             Monitor your group’s progress easily
+             </button>
+          
+
+          <!-- <img src="{{url('assets/adminassets/dist/img/Syncologo.png')}}" class="image" alt="" /> -->
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@
           <form action="" class="sign-in-form" method="POST">
           {{csrf_field()}}
           @include ('message')
+          <img src="uploads/project/logo.png" alt="Your Image" style="height: 19.6vw; width: auto; margin-top: -13rem" />
             <h2 class="title">Forgot Password</h2>
             <div class="input-field">
               <i class="fas fa-envelope"></i>
@@ -28,15 +29,26 @@
       <div class="panels-container">
         <div class="panel left-panel">
           <div class="content">
-            <h3>Sign In</h3>
-            <p>
-              Palitan mo met
-            </p>
+            <!-- <h3>Sign In</h3>
+             <p>
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Debitis,
+              ex ratione. Aliquid!
+            </p> --> 
             <a href="{{ url ('/')}}">
               <button class="btn transparent" id="sign-up-btn">
                 Sign In
               </button>
             </a>
+                      <img src="uploads/project/WW.png" alt="Your Image" class="styled-image" /> 
+             <button class="btnf1" >
+                    Progress at a glance
+             </button>
+             <button class="btnf2" >
+             Keep your project on point
+             </button>
+             <button class="btnf3" >
+             Monitor your group’s progress easily
+             </button>
           </div>
           <img src="#" class="image" alt="" />
         </div>

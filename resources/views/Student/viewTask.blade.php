@@ -3,51 +3,73 @@
 @section('content')
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">{{ $project->class_name }}</h1>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                    <h1 class="m-0">Tasks</h1>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
-            <h3>Tasks</h3>
-
-            @if($project->tasks->isEmpty())
-                <p>No tasks found for this project.</p>
-            @else
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="list-group">
-                                    @foreach($project->tasks->where('status', '!=', 'done') as $task)
-                                        <div class="list-group-item">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h5 class="mb-1">{{ $task->task_name }}</h5>
-                                                <form action="{{ route('done.task', ['projectId' => $project->id, 'taskId' => $task->id]) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-success btn-sm">Done</button>
-                                                </form>
-                                            </div>
-                                            <p class="mb-1">{{ $task->task_description }}</p>
-                                        </div>
-                                    @endforeach
+            <div class="row">
+                <!-- Pending Tasks -->
+                <div class="col-md-4">
+                    <div class="card" style="border-top: 5px solid #FFC107;">
+                        <div class="card-body">
+                            <h5>Pending Tasks</h5>
+                            @foreach($tasks->where('status', 'pending') as $task)
+                                <div class="list-group-item">
+                                    <h6>{{ $task->task_name }}</h6>
+                                    <p>{{ $task->task_description }}</p>
+                                    <form action="{{ route('task.start', ['taskId' => $task->id]) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary btn-sm">Start</button>
+                                    </form>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
-            @endif
-        </div><!-- /.container-fluid -->
+
+                <!-- In Progress Tasks -->
+                <div class="col-md-4">
+                    <div class="card" style="border-top: 5px solid #17A2B8;">
+                        <div class="card-body">
+                            <h5>In Progress</h5>
+                            @foreach($tasks->where('status', 'inprogress') as $task)
+                                <div class="list-group-item">
+                                    <h6>{{ $task->task_name }}</h6>
+                                    <p>{{ $task->task_description }}</p>
+                                    <form action="{{ route('task.complete', ['taskId' => $task->id]) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success btn-sm">Complete</button>
+                                    </form>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Completed Tasks -->
+                <div class="col-md-4">
+                    <div class="card" style="border-top: 5px solid #28A745;">
+                        <div class="card-body">
+                            <h5>Completed Tasks</h5>
+                            @foreach($tasks->where('status', 'completed') as $task)
+                                <div class="list-group-item">
+                                    <h6>{{ $task->task_name }}</h6>
+                                    <p>{{ $task->task_description }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
-    <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
 @endsection

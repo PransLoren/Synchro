@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Models\Task; 
 use Auth;
 use Str;
-
+use Carbon\Carbon;
 
 class ProjectController extends Controller
 {
@@ -31,9 +31,15 @@ class ProjectController extends Controller
     }
     public function insert(Request $request)
     {
+        $validatedData = $request->validate([
+            'class_name' => 'required|string|max:255',
+            'submission_date' => 'required|date',
+            'submission_time' => 'required|date_format:H:i',
+            'description' => 'required|string',
+        ]);
         $project = new ProjectModel;
         $project->class_name = $request->class_name;
-        $project->project_date = $request->project_date;
+        $project->submission_time = $request->submission_time;
         $project->submission_date = $request->submission_date;
         $descriptionWithoutNbsp = str_replace('&nbsp;', '', $request->description);
         $project->description = strip_tags($descriptionWithoutNbsp);
@@ -43,89 +49,98 @@ class ProjectController extends Controller
         return redirect('student/dashboard')->with('success','Project successfully added');
     }
 
+    public function edit($id)
+    {
+        $getRecord = ProjectModel::findOrFail($id);
+        $data['getRecord'] = $getRecord;
+        $data['header_title'] = 'Edit Project';
+        return view('Admin.admin.homework.edit', $data);
+    }
 
-        public function edit($id)
-        {
-            $getRecord = ProjectModel::findOrFail($id);
-            $data['getRecord'] = $getRecord;
-            $data['header_title'] = 'Edit Project';
-            return view('Admin.admin.homework.edit', $data);
+    public function update(Request $request, $id)
+    {
+        $project = ProjectModel::getSingle($id);
+        $project->class_name = trim($request->class_name);
+        $project->submission_time = trim($request->submission_time);
+        $project->submission_date = trim($request->submission_date);
+        $project->description = trim($request->description);
+
+        $project->save();
+
+        return redirect('student/dashboard')->with('success','Project successfully updated');
+    }
+
+    public function delete($id)
+    {
+        $project = ProjectModel::getSingle($id);
+        $project->is_delete = 1;
+        $project->save();
+
+        return redirect()->back()->with('success','Project successfully deleted');
+    }
+
+    public function submit($id)
+    {
+        $project = ProjectModel::getSingle($id);
+        $project->delete(); 
+    
+        return redirect('student/dashboard')->with('success','Project successfully submit')->with('confirmation', 'Project successfully submit');;
+    }
+
+    public function invite(Request $request, $projectId)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+ 
+        if ($validator->fails()) {
+            throw ValidationException::withMessages($validator->errors()->all());
         }
 
-        public function update(Request $request, $id)
-        {
-            $project = ProjectModel::getSingle($id);
-            $project->class_name = trim($request->class_name);
-            $project->project_date = trim($request->project_date);
-            $project->submission_date = trim($request->submission_date);
-            $project->description = trim($request->description);
+        $invitedUser = User::where('email', $request->email)->firstOrFail();
     
-    
-            $project->save();
-    
-            return redirect('student/dashboard')->with('success','Project successfully updated');
-        }
-
-        public function delete($id)
-        {
-            $project = ProjectModel::getSingle($id);
-            $project->is_delete = 1;
-            $project->save();
-
-            return redirect()->back()->with('success','Project successfully deleted');
-
-        }
-
-        public function submit($id)
-        {
-            $project = ProjectModel::getSingle($id);
-            $project->delete(); 
+        return response()->json(['success' => 'Invitation sent successfully.']);
         
-            return redirect('student/dashboard')->with('success','Project successfully submit')->with('confirmation', 'Project successfully submit');;
-        }
+    }
 
-        public function invite(Request $request, $projectId)
-        {
-          
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email',
-            ]);
-     
-            if ($validator->fails()) {
-                throw ValidationException::withMessages($validator->errors()->all());
-            }
-    
-            return response()->json(['success' => 'Invitation sent successfully.']);
-        }
+    public function viewTasks($projectId)
+    {
+        // Fetch the project along with tasks that are not completed
+        $project = ProjectModel::with(['tasks' => function ($query) {
+            $query->where('status', '!=', 'completed');
+        }])->findOrFail($projectId);
 
-        public function viewTasks($projectId)
-        {
+        // Extract the tasks from the project
+        $tasks = $project->tasks;
 
-            $project = ProjectModel::with(['tasks' => function ($query) {
-                $query->where('status', '!=', 'completed'); 
-            }])->findOrFail($projectId);
+        // Pass both project and tasks to the view
+        return view('Student.viewTask', compact('project', 'tasks'));
+    }   
 
-            return view('Student.viewTask', compact('project'));
-        }
-        
+    public function startTask($taskId)
+    {
+        $task = Task::findOrFail($taskId);
+        $task->status = 'inprogress'; 
+        $task->save(); 
 
-        public function markTaskAsDone(Request $request, $projectId, $taskId)
-        {
-            $task = Task::findOrFail($taskId);
-            $task->delete(); 
-    
-            return redirect('student/dashboard')->with('success','Project successfully submit')->with('confirmation', 'Project successfully submit');
-        }
-    
-    
+        return redirect()->back()->with('success', 'Task has been moved to In Progress.');
+    }
+
+    public function markTaskAsDone(Request $request, $projectId, $taskId)
+    {
+        $task = Task::findOrFail($taskId);
+        $task->status = 'completed';
+        $task->save(); 
+
+        return redirect('student/dashboard')->with('success','Task successfully marked as completed.');
+    }
+
     public function tasksubmit(Request $request, $projectId)
     {
-
         $request->validate([
             'task_name' => 'required|string|max:255',
             'task_description' => 'required|string',
         ]);
-        
 
         $project = ProjectModel::findOrFail($projectId);
         
@@ -133,10 +148,11 @@ class ProjectController extends Controller
         $task->task_name = $request->task_name;
         $task->task_description = $request->task_description;
         $task->project_id = $projectId;
+        $task->status = 'pending'; // Set default status to pending
         $task->save();
+
         return response()->json(['success' => 'Task submitted successfully.']);
     }
-    
 
     public function viewTask(Request $request, $taskName)
     {
@@ -145,4 +161,10 @@ class ProjectController extends Controller
         return response()->json($task);
     }
 
+    public function checkDeadlines()
+    {
+        $projects = ProjectModel::whereDate('submission_date', '=', Carbon::now()->addDay()->toDateString())
+                                ->where('submission_time', '>=', Carbon::now()->format('H:i'))
+                                ->get();
+    }
 }

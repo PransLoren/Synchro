@@ -32,8 +32,8 @@
                                 <thead>
                                     <tr>
                                         <th>Project Name</th>
-                                        <!-- Removed Homework Date -->
                                         <th>Submission Date</th>
+                                        <th>Submission Time</th>
                                         <th>Description</th>
                                         <th>Add Tasks</th>
                                         <th>Action</th>
@@ -51,6 +51,7 @@
                                         </td>
                                         <!-- Removed Homework Date -->
                                         <td>{{ date('d-m-Y', strtotime($value->submission_date)) }}</td>
+                                        <td>{{ date('H:i', strtotime($value->submission_time)) }}</td>
                                         <td>{{ $value->description }}</td>
                                         <td>
                                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taskModal{{ $value->id }}"><i class="fas fa-plus"></i></button>

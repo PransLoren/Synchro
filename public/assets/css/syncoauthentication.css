@@ -13,7 +13,7 @@ input {
 .container {
     position: relative;
     width: 100%;
-    background-color: #fff;
+    background-color: #ececec;
     min-height: 100vh;
     overflow: hidden;
 }
@@ -58,32 +58,74 @@ form.sign-up-form {
 form.sign-in-form {
     z-index: 2;
 }
-
+/* ----------ty lorde---------- */
+.sign-in-form {
+    height: 100vh;
+}
+/* ----------ty lorde---------- */
 .title {
     font-size: 2.2rem;
     color: #444;
-    margin-bottom: 10px;
+    margin-top: -5rem;
+    font-weight: 300;
+}
+.title2 {
+    font-size: 2.2rem;
+    color: #444;
+    margin-top: -5rem;
+    font-weight: 300;
+}
+.logo {
+    height: 20vw;
+    width: auto;
+    border-radius: 5%;
+    display: block;
+    margin: 4 auto;
+    /* display: block;   */
+    /* margin: 4 auto;  */
+    margin-left: 24rem;
+    margin-top: -10rem;
+}
+@media (max-width: 870px) {
+    .logo {
+        height: 15vw; /* Smaller height for smaller screens */
+        margin-left: auto; /* Center logo on smaller screens */
+        margin-right: auto;
+        margin-top: -5rem; /* Adjust top margin if needed */
+    }
+}
+/* .input-field {
+    max-width: 380px;       
+    width: 100%;             
+     background-color: #afb0b5;
+    margin: 10px 0;        
+    height: 45px;            
+    border-radius: 13px;     
+    display: grid;           
+    grid-template-columns: 15% 85%; 
+    padding: 0 0.4rem;       
+    position: relative;      
+    text-align: left;         
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.20);
+}
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px #afb0b5 inset !important;
+    -webkit-text-fill-color: white!important;
+    background-clip: padding-box !important;
+    border-radius: 13px; 
+    margin: 10px 0;   
+    margin-bottom: 30px;
+    font-size: 20px;
 }
 
-.input-field {
-    max-width: 380px;
-    width: 100%;
-    background-color: #f0f0f0;
-    margin: 10px 0;
-    height: 55px;
-    border-radius: 55px;
-    display: grid;
-    grid-template-columns: 15% 85%;
-    padding: 0 0.4rem;
-    position: relative;
-}
 
 .input-field i {
-    text-align: center;
-    line-height: 55px;
-    color: #acacac;
-    transition: 0.5s;
-    font-size: 1.1rem;
+    display: flex;            
+    align-items: center;      
+    justify-content: center;  
+    font-size: 1.1rem;       
+    height: 100%;           
+    
 }
 
 .input-field input {
@@ -94,10 +136,66 @@ form.sign-in-form {
     font-weight: 600;
     font-size: 1.1rem;
     color: #333;
+    text-align: left;
+    padding-left: 10px;
+}
+
+
+.input-field {
+    margin-bottom: 1rem; 
+}
+.input-field input::placeholder {
+    /* color: #aaa;  
+    font-weight: 500;
+    
+ */
+.input-field {
+    max-width: 380px;
+    width: 100%;
+    background-color: #d6d7dd;
+    margin: 10px 0;
+    height: 45px;
+    border-radius: 13px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    padding: 0 0.4rem;
+    position: relative;
+    text-align: left;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px #d6d7dd inset !important;
+    -webkit-text-fill-color: #585454 !important;
+    background-clip: padding-box !important;
+    border-radius: 13px;
+
+    font-size: 10px;
+}
+
+.input-field i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    height: 100%;
+    margin-right: 10px;
+    margin-left: 10px;
+    color: #435e77;
+}
+
+.input-field input {
+    background: none;
+    outline: none;
+    border: none;
+    line-height: 1;
+    font-weight: 400;
+    font-size: 15px;
+    color: #333;
+    text-align: left;
+    padding-left: 10px;
 }
 
 .input-field input::placeholder {
-    color: #aaa;
     font-weight: 500;
 }
 
@@ -132,22 +230,22 @@ form.sign-in-form {
 }
 
 .btn {
-    width: 150px;
-    background-color: #0b3554;
+    width: 250px;
+    height: 45px;
+    background-color: #1d2d44;
     border: none;
     outline: none;
-    height: 49px;
-    border-radius: 49px;
+    border-radius: 13px;
     color: #fff;
     text-transform: uppercase;
     font-weight: 600;
-    margin: 10px 0;
+    margin: 30px 0;
     cursor: pointer;
     transition: 0.5s;
 }
 
 .btn:hover {
-    background-color: #274aac;
+    background-color: #8fafd1;
 }
 
 .panels-container {
@@ -163,17 +261,91 @@ form.sign-in-form {
 .container:before {
     content: "";
     position: absolute;
-    height: 2000px;
-    width: 2000px;
-    top: -10%;
-    right: 48%;
+    height: 45vw;
+    width: 45vw;
+    top: 50%;
+    left: 3%;
     transform: translateY(-50%);
-    background-image: linear-gradient(-45deg, #0b3554 0%, #0b3554 100%);
+    border-radius: 5%;
+    /* background-image: linear-gradient(-45deg, #0b3554 0%, #330028 100%);  */
+    background-color: #425673;
     transition: 1.8s ease-in-out;
-    border-radius: 50%;
     z-index: 6;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
+.btnf1 {
+    position: absolute; /* Position relative to the container */
+    bottom: 38%; /* Adjust this value to position the button vertically */
+    left: 45%;
+    transform: translateX(-50%); /* Center horizontally */
+    width: 320px;
+    height: 55px;
+    background-color: #435e77;
+    border: none;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    border-radius: 30px;
+    color: #fff;
+    font-weight: 500;
+    font-size: 15px;
+    transition: 0.5s;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.btnf2 {
+    position: absolute; /* Position relative to the container */
+    bottom: 50%; /* Adjust this value to position the button vertically */
+    left: 15%;
+    transform: translateX(-50%); /* Center horizontally */
+    width: 320px;
+    height: 55px;
+    background-color: #737373;
+    border: none;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    border-radius: 30px;
+    color: #0f0f0f;
+    font-weight: 500;
+    font-size: 15px;
+    transition: 0.5s;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.btnf3 {
+    position: absolute; /* Position relative to the container */
+    bottom: 5%; /* Adjust this value to position the button vertically */
+    left: 15%;
+    transform: translateX(-50%); /* Center horizontally */
+    width: 350px;
+    height: 55px;
+    background-color: #d1cccc;
+    border: none;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    border-radius: 30px;
+    color: #0f0f0f;
+    font-weight: 500;
+    font-size: 15px;
+    transition: 0.5s;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.styled-image {
+    height: 38vw;
+    width: auto;
+    border-radius: 5%;
+    display: block;
+    margin: 6 auto;
+    margin-right: -6rem;
+    margin-top: 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+.logo-image {
+    height: 20vw;
+    width: auto;
+    border-radius: 5%;
+    display: block;
+    margin: 4 auto;
+    margin-left: 78rem;
+    margin-top: 3rem;
+}
 
 .panel {
     display: flex;
@@ -211,21 +383,52 @@ form.sign-in-form {
     padding: 0.7rem 0;
 }
 
-.btn.transparent {
+/* .btn.transparent {
     margin: 0;
     background: none;
-    border: 2px solid #fff;
+    margin-top: 0px;
+    border: 2px solid #be4a4a;
     width: 130px;
     height: 41px;
     font-weight: 600;
     font-size: 0.8rem;
+    color: #be4a4a;
+} */
+#sign-up-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.container {
+    position: relative;
+}
+
+.panels-container {
+    position: relative;
+}
+
+.btn.transparent {
+    margin: 40px;
+    width: 120px;
+    height: 40px;
+    color: #fff;
+    border-radius: 13px;
+    background-color: #0d1321;
+    /* padding: 3px 10px; */
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.btn.transparent:hover {
+    background-color: #8fafd1;
+    color: #fff;
 }
 
 .right-panel .image,
 .right-panel .content {
     transform: translateX(800px);
 }
-
 
 /* ANIMATION */
 
@@ -264,6 +467,19 @@ form.sign-in-form {
 
 .container.sign-up-mode .right-panel {
     pointer-events: all;
+}
+.forgot-password-link {
+    color: #0b3554;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.forgot-password-link:hover {
+    color: #719ecf;
 }
 
 @media (max-width: 870px) {

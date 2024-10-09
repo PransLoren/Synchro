@@ -96,14 +96,18 @@ Route::group(['middleware' => ['auth', 'student']], function () {
     Route::get('student/project/project/edit/{id}', [ProjectController::class, 'edit']);
     Route::post('student/project/project/edit/{id}', [ProjectController::class, 'update']);
     Route::post('student/project/project/delete/{id}', [ProjectController::class, 'delete']);
+    Route::post('student/project/project/submit/{id}', [ProjectController::class, 'submit']);
     Route::post('/invite/{projectId}', [ProjectController::class, 'invite'])->name('invite');
     Route::post('/task/submit/{id}', [ProjectController::class, 'tasksubmit'])->name('task.submit');
+    Route::post('/task/start/{taskId}', [ProjectController::class, 'startTask'])->name('task.start');
+    Route::post('/project/{projectId}/task/{taskId}/done', [ProjectController::class, 'markTaskAsDone'])->name('task.done');
     Route::get('/student/project/view/{projectId}', [ProjectController::class, 'viewTasks'])->name('project.view.tasks');
     Route::post('/student/project/view/{projectId}/task/{taskId}/done', [ProjectController::class, 'markTaskAsDone'])->name('done.task');
 
     // Project Invitation Routes
-    Route::get('/student/invitations', [ProjectInvitationController::class, 'showInvitations'])->name('student.invitations');
+    Route::get('/student/invitations', [ProjectInvitationController::class, 'showInvitations'])->name('invitations.index');
     Route::post('/projects/{project}/invite', [ProjectInvitationController::class, 'invite'])->name('projects.invite');
     Route::post('/projects/{project}/invitation/accept', [ProjectInvitationController::class, 'acceptInvitation'])->name('projects.acceptInvitation');
     Route::post('/projects/{project}/invitation/reject', [ProjectInvitationController::class, 'rejectInvitation'])->name('projects.rejectInvitation');
+
 });

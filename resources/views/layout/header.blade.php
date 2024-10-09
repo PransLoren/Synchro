@@ -68,11 +68,23 @@
           </li>
 
           <li class="nav-item">
-            <a href="{{url ('student/invitations')}}" class="nav-link @if(Request::segment(2) =='invitations') active @endif" style="color: #EAEAEA;">
+            <a href="{{ route('invitations.index') }}" class="nav-link @if(Request::segment(2) =='invitations') active @endif" style="color: #EAEAEA;">
               <i class="nav-icon fas fa-envelope" style="color: #FF6F61;"></i>
-              <p>Pending Invitations</p>
+              <p>
+                Pending Invitations
+                @php
+                    $invitationCount = \App\Models\ProjectInvitation::where('email', Auth::user()->email)
+                                        ->where('status', \App\Models\ProjectInvitation::STATUS_PENDING)
+                                        ->count();
+                @endphp
+                @if($invitationCount > 0)
+                  <span class="badge badge-warning">{{ $invitationCount }}</span>
+                @endif
+              </p>
             </a>
           </li>
+
+
 
           <li class="nav-item">
             <a href="{{url ('student/profile')}}" class="nav-link @if(Request::segment(2) =='profile') active @endif" style="color: #EAEAEA;">
