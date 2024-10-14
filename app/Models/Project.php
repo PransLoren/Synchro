@@ -5,15 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProjectModel extends Model
+class Project extends Model
 {
     use HasFactory;
 
-    protected $table = 'project';
+    // Explicitly set the table name
+    protected $table = 'project';  // If your table is named 'project'
 
+    protected $fillable = [
+        'class_name', 'description', 'submission_date', 'submission_time', 'created_by', 'is_delete'
+    ];
+
+    // Relationships
     public function users()
     {
-        return $this->belongsToMany(User::class, 'project_user', 'project_id', 'user_id');
+        return $this->belongsToMany(User::class, 'project_user', 'project_id', 'user_id')
+        ->withPivot('role');
     }
 
     public function tasks()
@@ -26,6 +33,7 @@ class ProjectModel extends Model
         return $this->hasMany(ProjectInvitation::class, 'project_id');
     }
 
+    // Static methods to get records
     static public function getSingle($id)
     {
         return self::find($id);
@@ -33,15 +41,14 @@ class ProjectModel extends Model
 
     static public function getRecord()
     {
-        $return = ProjectModel::select('project.*')
+        return self::select('project.*')
                     ->join('users', 'users.id', '=', 'project.created_by')
                     ->orderBy('project.id', 'desc')
-                    ->where('project.is_delete','=',0)
+                    ->where('project.is_delete', '=', 0)
                     ->paginate(20);
-        
-        return $return;
     }
 
+    // Document path getter
     public function getDocument()
     {
         if (!empty($this->document_file) && file_exists('upload/project/' . $this->document_file)) {
@@ -50,4 +57,10 @@ class ProjectModel extends Model
             return "";
         }
     }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
 }

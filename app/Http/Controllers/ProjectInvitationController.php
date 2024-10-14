@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\ProjectModel;
+use App\Models\Project;
 use App\Models\ProjectInvitation;
 use Illuminate\Http\Request;
 use App\Notifications\EmailProjectInvitationNotification;
@@ -12,7 +12,7 @@ use App\Notifications\EmailRejectInvitationNotification;
 
 class ProjectInvitationController extends Controller
 {
-    public function invite(Request $request, ProjectModel $project)
+    public function invite(Request $request, Project $project)
     {
         // Validate user input
         $request->validate([
@@ -50,12 +50,12 @@ class ProjectInvitationController extends Controller
         ]);
 
         // Send invitation via email
-        $user->notify(new EmailProjectInvitationNotification($project));
+        $user->notify(new EmailProjectInvitationNotification($project)); // Make sure this notification class matches the Project model type
 
         return back()->with('success', 'Invitation sent successfully.');
     }
 
-    public function acceptInvitation(ProjectModel $project)
+    public function acceptInvitation(Project $project)
     {
         $user = auth()->user();
 
@@ -77,8 +77,6 @@ class ProjectInvitationController extends Controller
 
         return redirect()->route('userdashboard')->with('success', 'Invitation accepted successfully!');
     }
-
-
 
     public function rejectInvitation(ProjectInvitation $invitation)
     {
@@ -103,5 +101,4 @@ class ProjectInvitationController extends Controller
         
         return view('invitations.index', compact('invitations'));
     }
-
 }

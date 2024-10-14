@@ -34,7 +34,6 @@
                                         <th>Project Name</th>
                                         <th>Submission Date</th>
                                         <th>Submission Time</th>
-                                        <th>Description</th>
                                         <th>Add Tasks</th>
                                         <th>Action</th>
                                         <th>Edit Project</th>
@@ -43,36 +42,36 @@
                                 </thead>
                                 <tbody>
                                     @foreach($userProjects as $value)
-                                    <tr style="background-color: #eff8ff;">
-                                        <td>
-                                            <a href="{{ route('project.view.tasks', ['projectId' => $value->id]) }}">
-                                                {{ $value->class_name }}
-                                            </a>
-                                        </td>
-                                        <!-- Removed Homework Date -->
-                                        <td>{{ date('d-m-Y', strtotime($value->submission_date)) }}</td>
-                                        <td>{{ date('H:i', strtotime($value->submission_time)) }}</td>
-                                        <td>{{ $value->description }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taskModal{{ $value->id }}"><i class="fas fa-plus"></i></button>
-                                        </td>
-                                        <td>
-                                            <form action="{{ url('student/project/project/submit/'.$value->id) }}" method="POST" style="display: inline;">
-                                                @csrf
-                                                @method('POST')
-                                                <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to end this task?')"><i class="fas fa-check"></i></button>
-                                            </form>
-                                        </td>
-                                        <td>
-                                            <a href="{{ url('student/project/project/edit/'.$value->id) }}" class="btn btn-warning"><i class="fas fa-edit"></i></a>
-                                        </td>
-                                        <td> 
-                                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#inviteUserModal{{ $value->id }}">Invite User</button>
-                                        </td>
-                                    </tr>
+                                        <tr style="background-color: #eff8ff;">
+                                            <td>
+                                                <a href="{{ route('project.view.tasks', ['projectId' => $value->id]) }}">
+                                                    {{ $value->class_name }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $value->submission_date }}</td>
+                                            <td>{{ $value->submission_time }}</td>
+                                            <td>
+                                                @if(Auth::id() == $value->created_by) <!-- Only project creator can add tasks -->
+                                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taskModal{{ $value->id }}"><i class="fas fa-plus"></i></button>
+                                                @endif
+                                            </td>
+
+                                            <td>
+                                                <form action="{{ url('student/project/project/submit/'.$value->id) }}" method="POST" style="display: inline;">
+                                                    @csrf
+                                                    @method('POST')
+                                                    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to end this task?')"><i class="fas fa-check"></i></button>
+                                                </form>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url('student/project/project/edit/'.$value->id) }}" class="btn btn-warning"><i class="fas fa-edit"></i></a>
+                                            </td>
+                                            <td> 
+                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#inviteUserModal{{ $value->id }}">Invite User</button>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
-
                             </table>
                             <div style="padding: 10px; float: right;">
                                 {!! $userProjects->appends(request()->except('page'))->links() !!}
@@ -114,28 +113,41 @@
 @endforeach
 
 <!-- Task Modal -->
+
 @foreach($userProjects as $value)
 <div class="modal fade" id="taskModal{{ $value->id }}" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel{{ $value->id }}" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="taskModalLabel{{ $value->id }}">Task Form</h5>
+            <div class="modal-header" style="background-color: #46637F; color: #FFFFFF;">
+                <h5 class="modal-title" id="taskModalLabel{{ $value->id }}" style="color: #101621;">
+                    Task Form for Project: {{ $value->class_name }}
+                </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <span aria-hidden="true" style="color: #FFFFFF;">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="background-color: #E1E3E4; color: #101621;">
                 <!-- Task Form -->
-                @csrf
-                <form id="taskForm{{ $value->id }}">
+                <form id="taskForm{{ $value->id }}" action="{{ route('task.submit', ['id' => $value->id]) }}" method="POST">
+                    @csrf
                     <div class="form-group">
                         <label for="taskName">Task Name:</label>
                         <input type="text" class="form-control" id="taskName" name="task_name" required>
-                        <!-- Make sure the name attribute matches the field name in your controller -->
                     </div>
                     <div class="form-group">
                         <label for="taskDesc">Description:</label>
                         <input type="text" class="form-control" id="taskDesc" name="task_description" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignedTo">Assign To:</label>
+                        <select class="form-control" id="assignedTo" name="assigned_to" required>
+                            <option value="" disabled selected>Select User</option>
+                            @foreach($value->users as $user)
+                                @if($user->id !== $value->created_by) <!-- Exclude creator of the project -->
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endif
+                            @endforeach
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Submit</button>
                 </form>
@@ -146,8 +158,6 @@
     </div>
 </div>
 @endforeach
-
-<!-- /.content-wrapper -->
 
 <!-- Your custom JavaScript -->
 <script>

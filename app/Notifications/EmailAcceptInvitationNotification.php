@@ -3,7 +3,7 @@
 // App\Notifications\EmailAcceptInvitation.php
 namespace App\Notifications;
 
-use App\Models\ProjectModel;
+use App\Models\Project;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
@@ -15,7 +15,7 @@ class EmailAcceptInvitationNotification extends Notification
 
     protected $project;
 
-    public function __construct(ProjectModel $project)
+    public function __construct(Project $project)
     {
         $this->project = $project;
         $this->token = $token;

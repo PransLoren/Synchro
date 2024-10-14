@@ -29,12 +29,20 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
+    // Relationship for projects where the user is a member
     public function projects()
     {
-        return $this->belongsToMany(ProjectModel::class, 'project_user', 'user_id', 'project_id')
+        return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id')
                     ->where('is_delete', '=', 0);
     }
 
+    // Relationship for projects created by the user
+    public function createdProjects()
+    {
+        return $this->hasMany(Project::class, 'created_by');
+    }
+
+    // Static methods for different user retrieval
     public static function getSingle($id)
     {
         $user = self::find($id);
@@ -53,18 +61,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $query->orderBy('id', 'desc')->paginate(10);
     }
 
-
-    
     public static function getStudent()
     {
         $return = User::select('users.*')
-                        ->where('user_type', '=', 3)
-                        ->where('is_delete', '=', 0);
+                      ->where('user_type', '=', 3)
+                      ->where('is_delete', '=', 0);
         return $return->orderBy('id', 'desc')
                       ->paginate(10);
     }
-
-
 
     public static function getEmailSingle($email)
     {
@@ -88,5 +92,4 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->unreadNotifications()->where('type', 'invitation')->count();
     }
-
 }
