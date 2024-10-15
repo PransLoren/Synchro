@@ -27,6 +27,7 @@
                                     <div class="list-group-item" id="task-{{ $task->id }}">
                                         <h6>{{ $task->task_name }}</h6>
                                         <p>{{ $task->task_description }}</p>
+                                        <p><strong>Assigned to:</strong> {{ $task->assignedUser->name ?? 'Unassigned' }}</p> <!-- Assigned User -->
                                         <form action="{{ route('task.start', ['taskId' => $task->id]) }}" method="POST" class="start-task-form">
                                             @csrf
                                             <button type="submit" class="btn btn-primary btn-sm">Start</button>
@@ -48,6 +49,7 @@
                                     <div class="list-group-item" id="task-{{ $task->id }}">
                                         <h6>{{ $task->task_name }}</h6>
                                         <p>{{ $task->task_description }}</p>
+                                        <p><strong>Assigned to:</strong> {{ $task->assignedUser->name ?? 'Unassigned' }}</p> <!-- Assigned User -->
                                         <form action="{{ route('task.complete', ['taskId' => $task->id]) }}" method="POST" class="complete-task-form">
                                             @csrf
                                             <button type="submit" class="btn btn-success btn-sm">Complete</button>
@@ -69,6 +71,7 @@
                                     <div class="list-group-item" id="task-{{ $task->id }}">
                                         <h6>{{ $task->task_name }}</h6>
                                         <p>{{ $task->task_description }}</p>
+                                        <p><strong>Assigned to:</strong> {{ $task->assignedUser->name ?? 'Unassigned' }}</p> <!-- Assigned User -->
                                     </div>
                                 @endforeach
                             </div>

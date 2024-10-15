@@ -14,13 +14,25 @@
         </div><!-- /.container-fluid -->
     </div>
 
+    <!-- Notification Button -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <ul class="navbar-nav ml-auto">
+            <!-- Notification button -->
+            <li class="nav-item">
+            <a href="{{ route('notifications.index') }}" class="btn btn-primary">
+                Notifications <span id="notification-count" class="badge badge-warning">0</span>
+            </a>
+            </li>
+        </ul>
+    </nav>
+    <!-- End of Notification Button -->
+
     <h1>Project Report</h1>
 
     <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-
                     @include('message')
                     <div class="card">
                         <div class="card-header">
@@ -55,7 +67,6 @@
                                                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taskModal{{ $value->id }}"><i class="fas fa-plus"></i></button>
                                                 @endif
                                             </td>
-
                                             <td>
                                                 <form action="{{ url('student/project/project/submit/'.$value->id) }}" method="POST" style="display: inline;">
                                                     @csrf
@@ -113,7 +124,6 @@
 @endforeach
 
 <!-- Task Modal -->
-
 @foreach($userProjects as $value)
 <div class="modal fade" id="taskModal{{ $value->id }}" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel{{ $value->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -159,74 +169,30 @@
 </div>
 @endforeach
 
-<!-- Your custom JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        @foreach($userProjects as $value)
-        $('#inviteUserForm{{ $value->id }}').submit(function(e) {
-            e.preventDefault(); // Prevent default form submission
-            
+        // Function to fetch unread notifications count
+        function fetchUnreadNotificationsCount() {
             $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
+                url: "{{ route('notifications.unread.count') }}", // Fetch unread count
+                method: 'GET',
                 success: function(response) {
-                    if (confirm('Invitation sent successfully. Do you want to close the modal?')) {
-                        $('#inviteUserModal{{ $value->id }}').modal('hide');
-                    }
+                    // Update the notification count badge
+                    $('#notification-count').text(response.unread_count);
                 },
-                error: function(xhr, status, error) {
-                    $('#inviteUserMessage{{ $value->id }}').html('<div class="alert alert-danger">' + xhr.responseJSON.message + '</div>');
+                error: function(error) {
+                    console.error('Failed to fetch unread notifications count', error);
                 }
             });
-        });
-        $('#taskForm{{ $value->id }}').submit(function(e) {
-            e.preventDefault(); // Prevent default form submission
-            
-            // Get the CSRF token
-            var token = "{{ csrf_token() }}";
-            
-            $.ajax({
-                type: 'POST',
-                url: '{{ route("task.submit", ["id" => $value->id]) }}', // Use the correct route with the project ID
-                data: $(this).serialize(),
-                headers: {
-                    'X-CSRF-TOKEN': token // Include CSRF token in headers
-                },
-                success: function(response) {
-                    if (confirm('Task submitted successfully. Do you want to close the modal?')) {
-                        $('#taskModal{{ $value->id }}').modal('hide');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    $('#taskMessage{{ $value->id }}').html('<div class="alert alert-danger">' + xhr.responseJSON.message + '</div>');
-                }
-            });
-        });
-        @endforeach
-    });
+        }
 
+        // Fetch unread count every 30 seconds
+        setInterval(fetchUnreadNotificationsCount, 30000);
 
-    $(document).ready(function() {
-        @foreach($userProjects as $value)
-        $('#inviteUserForm{{ $value->id }}').submit(function(e) {
-            e.preventDefault(); // Prevent default form submission
-            
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (confirm('Invitation sent successfully. Do you want to close the modal?')) {
-                        $('#inviteUserModal{{ $value->id }}').modal('hide');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    $('#inviteUserMessage{{ $value->id }}').html('<div class="alert alert-danger">' + xhr.responseJSON.message + '</div>');
-                }
-            });
-        });
-        @endforeach
+        // Initial fetch on page load
+        fetchUnreadNotificationsCount();
     });
 </script>
+
 @endsection

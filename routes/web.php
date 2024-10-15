@@ -56,8 +56,6 @@ Route::post('/email/verification-notification', function (Request $request) {
 Route::get('/student/profile', [WebAuthController::class, 'profile'])->name('student.profile')->middleware('verified');
 Route::post('/profile/update', [WebAuthController::class, 'update'])->name('profile.update')->middleware('verified');
 
-// Notification Routes
-Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
 // Admin Group Routes (middleware: admin)
 Route::group(['middleware' => ['auth', 'admin']], function () {
@@ -107,8 +105,14 @@ Route::group(['middleware' => ['auth', 'student']], function () {
 
     Route::get('/student/project/overview/{id?}', [ProjectController::class, 'showOverview'])->name('project.overview');
     
+    // Fetch notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadNotificationsCount'])->name('notifications.unread_count');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadNotificationsCount'])->name('notifications.unread.count');
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 
-    // Project Invitation Routes
+
     Route::get('/student/invitations', [ProjectInvitationController::class, 'showInvitations'])->name('invitations.index');
     Route::post('/projects/{project}/invite', [ProjectInvitationController::class, 'invite'])->name('projects.invite');
     Route::post('/projects/{project}/invitation/accept', [ProjectInvitationController::class, 'acceptInvitation'])->name('projects.acceptInvitation');

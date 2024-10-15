@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Task; 
+use App\Models\Notification; 
 use Auth;
 use Str;
 use Carbon\Carbon;
@@ -25,7 +26,7 @@ class ProjectController extends Controller
         $data['header_title'] = 'Project';
         return view('Admin.admin.homework.list1', $data);
     }
-    
+
     public static function add() {
         $data['header_title'] = 'Add New Project';
         return view('Admin.admin.homework.add', $data);
@@ -43,18 +44,29 @@ class ProjectController extends Controller
         $project->class_name = $request->class_name;
         $project->submission_time = $request->submission_time;
         $project->submission_date = $request->submission_date;
-        $descriptionWithoutNbsp = str_replace('&nbsp;', '', $request->description);
-        $project->description = strip_tags($descriptionWithoutNbsp);
+        $project->description = strip_tags(str_replace('&nbsp;', '', $request->description));
         $project->created_by = Auth::user()->id;
     
         try {
             $project->save();
-            $project->users()->attach(Auth::user()->id, ['role' => 'creator']); // Attach the creator with role
+            $project->users()->attach(Auth::user()->id, ['role' => 'creator']); 
+    
+            // Notify the creator
+            Notification::create([
+                'user_id' => Auth::id(),
+                'notifiable_type' => Project::class,
+                'notifiable_id' => $project->id,
+                'type' => 'project_creation', 
+                'message' => "You have successfully created the project '{$project->class_name}'.",
+                'is_read' => false,
+                'created_at' => now(),
+            ]);
+    
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to add project: ' . $e->getMessage());
         }
     
-        return redirect('student/dashboard')->with('success','Project successfully added');
+        return redirect('student/dashboard')->with('success', 'Project successfully added');
     }
     
 
@@ -71,7 +83,6 @@ class ProjectController extends Controller
         $data['header_title'] = 'Edit Project';
         return view('Admin.admin.homework.edit', $data);
     }
-    
 
     public function update(Request $request, $id) {
         $project = Project::getSingle($id);
@@ -86,7 +97,7 @@ class ProjectController extends Controller
             return redirect()->back()->with('error', 'Failed to update project: ' . $e->getMessage());
         }
 
-        return redirect('student/dashboard')->with('success','Project successfully updated');
+        return redirect('student/dashboard')->with('success', 'Project successfully updated');
     }
 
     public function delete($id) {
@@ -99,7 +110,7 @@ class ProjectController extends Controller
             return redirect()->back()->with('error', 'Failed to delete project: ' . $e->getMessage());
         }
 
-        return redirect()->back()->with('success','Project successfully deleted');
+        return redirect()->back()->with('success', 'Project successfully deleted');
     }
 
     public function submit($id) {
@@ -118,7 +129,6 @@ class ProjectController extends Controller
         }
         return redirect('student/dashboard')->with('success', 'Project successfully submitted');
     }
-    
 
     public function invite(Request $request, $projectId) {
         $validator = Validator::make($request->all(), [
@@ -133,26 +143,37 @@ class ProjectController extends Controller
         $project = Project::findOrFail($projectId);
     
         try {
-            $project->users()->attach($invitedUser->id, ['role' => 'member']); // Attach invited user with member role
+            $project->users()->attach($invitedUser->id, ['role' => 'member']); 
+
+            Notification::create([
+                'user_id' => $invitedUser->id,
+                'notifiable_type' => Project::class,
+                'notifiable_id' => $project->id,
+                'type' => 'project_invitation',
+                'message' => "You have been invited to join the project '{$project->class_name}'.",
+                'is_read' => false,
+                'created_at' => now(),
+            ]);
+
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to send invitation: ' . $e->getMessage()]);
+            return redirect()->back()->with(['error' => 'Failed to send invitation: ' . $e->getMessage()]);
         }
     
-        return response()->json(['success' => 'Invitation sent successfully.']);
+        return redirect()->back()->with(['success' => 'Invitation sent successfully.']);
     }
+
     public function viewTasks($projectId) {
-    // Fetch the project along with all tasks
-    $project = Project::with('tasks')->findOrFail($projectId);
-    $tasks = $project->tasks;
-
-    // Pass both project and tasks to the view
-    return view('Student.viewTask', compact('project', 'tasks'));
+        // Load the project with tasks and their assigned users
+        $project = Project::with(['tasks.assignedUser'])->findOrFail($projectId);
+        $tasks = $project->tasks;
+    
+        return view('Student.viewTask', compact('project', 'tasks'));
     }
-
-
+    
     public function startTask($taskId) {
         $task = Task::findOrFail($taskId);
         $user = Auth::user();
+
         if ($task->assigned_to != $user->id) {
             return redirect()->back()->with('error', 'You do not have permission to start this task.');
         }
@@ -160,37 +181,66 @@ class ProjectController extends Controller
         try {
             $task->status = 'inprogress';
             $task->save();
+
+            $project = $task->project;
+            $creator = $project->users()->wherePivot('role', 'creator')->first();
+            if ($creator) {
+                Notification::create([
+                    'user_id' => $creator->id,
+                    'notifiable_type' => Task::class,
+                    'notifiable_id' => $task->id,
+                    'type' => 'task_started', 
+                    'message' => "The task '{$task->task_name}' has been started by '{$user->name}' in project '{$project->class_name}'.",
+                    'is_read' => false,
+                    'created_at' => now(),
+                ]);
+            }
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to start the task: ' . $e->getMessage());
         }
-    
+
         return redirect()->back()->with('success', 'Task has been moved to In Progress.');
     }
-    
 
     public function markTaskAsDone(Request $request, $taskId) {
         $task = Task::findOrFail($taskId);
         $user = Auth::user();
-    
+
         if ($task->assigned_to != $user->id) {
             return redirect()->back()->with('error', 'You do not have permission to mark this task as completed.');
         }
+
         try {
             $task->status = 'completed';
             $task->save();
+
+            $project = $task->project;
+            $creator = $project->users()->wherePivot('role', 'creator')->first();
+            if ($creator) {
+                Notification::create([
+                    'user_id' => $creator->id,
+                    'notifiable_type' => Task::class,
+                    'notifiable_id' => $task->id,
+                    'type' => 'task_completed',
+                    'message' => "The task '{$task->task_name}' has been completed by '{$user->name}' in project '{$project->class_name}'.",
+                    'is_read' => false,
+                    'created_at' => now(),
+                ]);
+            }
+
         } catch (\Exception $e) {
             return redirect('student/dashboard')->with('error', 'Failed to mark task as completed: ' . $e->getMessage());
         }
+
         return redirect('student/dashboard')->with('success', 'Task successfully marked as completed.');
     }
-    
-    
 
     public function tasksubmit(Request $request, $id) {
         $request->validate([
             'task_name' => 'required|string|max:255',
             'task_description' => 'required|string',
-            'assigned_to' => 'required|exists:users,id', // Validate the assigned user
+            'assigned_to' => 'required|exists:users,id', 
         ]);
     
         try {
@@ -200,15 +250,24 @@ class ProjectController extends Controller
                 'project_id' => $id,
                 'assigned_to' => $request->assigned_to,
                 'status' => 'pending',
-
             ]);
+
+            Notification::create([
+                'user_id' => $request->assigned_to,
+                'notifiable_type' => Task::class,
+                'notifiable_id' => $task->id,
+                'type' => 'task_assignment',
+                'message' => "You have been assigned a new task: '{$task->task_name}' in project '{$task->project->class_name}'.",
+                'is_read' => false,
+                'created_at' => now(),
+            ]);
+
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to submit task: ' . $e->getMessage()]);
+            return redirect()->back()->with(['error' => 'Failed to submit task: ' . $e->getMessage()]);
         }
     
-        return response()->json(['success' => 'Task submitted successfully.']);
+        return redirect('student/dashboard')->with('success', 'Task submitted successfully.');
     }
-    
 
     public function viewTask(Request $request, $taskName) {
         $task = Task::where('task_name', $taskName)->first();
@@ -217,20 +276,30 @@ class ProjectController extends Controller
 
     public function checkDeadlines() {
         $projects = Project::whereDate('submission_date', '=', Carbon::now()->addDay()->toDateString())
-                                ->where('submission_time', '>=', Carbon::now()->format('H:i'))
-                                ->get();
-        // Handle the upcoming deadline notification
+                            ->where('submission_time', '>=', Carbon::now()->format('H:i'))
+                            ->get();
+
+        foreach ($projects as $project) {
+            foreach ($project->users as $user) {
+                Notification::create([
+                    'user_id' => $user->id,
+                    'notifiable_type' => Project::class,
+                    'notifiable_id' => $project->id,
+                    'type' => 'deadline_reminder',
+                    'message' => "Reminder: The project '{$project->class_name}' is due in 24 hours.",
+                    'is_read' => false,
+                    'created_at' => now(),
+                ]);
+            }
+        }
     }
+
     public function showOverview($id = null)
     {
-        // Fetch all projects for the authenticated user
         $projects = auth()->user()->projects;
 
-        // Determine the current project to be displayed
         $currentProject = $id ? Project::with(['users', 'tasks', 'creator'])->find($id) : ($projects->first() ?? null);
 
         return view('Student.project-overview', compact('projects', 'currentProject'));
     }
-
-
 }

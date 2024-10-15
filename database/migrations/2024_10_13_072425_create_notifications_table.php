@@ -16,15 +16,15 @@ class CreateNotificationsTable extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('notifiable_type');
-            $table->unsignedBigInteger('notifiable_id');
-            $table->string('type');
-            $table->text('message');
-            $table->boolean('is_read')->default(0);
-            $table->timestamp('created_at')->nullable();
-            $table->timestamp('read_at')->nullable();
+            $table->string('notifiable_type'); // Polymorphic relation
+            $table->unsignedBigInteger('notifiable_id'); // Polymorphic relation
+            $table->string('type')->nullable(); // Type field (you can use this to define notification type)
+            $table->text('message'); // Message field for the notification content
+            $table->boolean('is_read')->default(0); // Marks if the notification has been read
+            $table->timestamps(); // Adds `created_at` and `updated_at` columns
+            $table->timestamp('read_at')->nullable(); // Custom timestamp for when the notification is read
 
-            // Foreign key constraint
+            // Foreign key constraint for user reference
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

@@ -97,12 +97,6 @@
             Project Overview
           </a>
         </li>
-        <li class="nav-item">
-        <a href="{{ route('notifications.index') }}" class="nav-link @if(Request::is('notifications')) active @endif">
-            <i class="nav-icon fas fa-bell"></i>
-            <p>Notifications</p>
-        </a>
-      </li>
 
 
 
