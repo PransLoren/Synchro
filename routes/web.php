@@ -96,15 +96,20 @@ Route::group(['middleware' => ['auth', 'student']], function () {
     Route::post('student/project/project/delete/{id}', [ProjectController::class, 'delete']);
     Route::post('student/project/project/submit/{id}', [ProjectController::class, 'submit']);
     Route::post('/invite/{projectId}', [ProjectController::class, 'invite'])->name('invite');
-    Route::post('/project/{id}/task/submit', [ProjectController::class, 'tasksubmit'])->name('task.submit');
+    Route::post('/project/{id}/task/add', [ProjectController::class, 'tasksubmit'])->name('task.add');
     Route::post('/task/start/{taskId}', [ProjectController::class, 'startTask'])->name('task.start');
+    Route::post('/task/{taskId}/submit', [ProjectController::class, 'submitTaskForReview'])->name('task.submit');
+    Route::post('/task/{taskId}/approve', [ProjectController::class, 'approveTask'])->name('task.approve');
+    Route::post('/task/{taskId}/reject', [ProjectController::class, 'rejectTask'])->name('task.reject');
     Route::post('/task/complete/{taskId}', [ProjectController::class, 'markTaskAsDone'])->name('task.complete');
     Route::post('/project/{projectId}/task/{taskId}/done', [ProjectController::class, 'markTaskAsDone'])->name('task.done');
     Route::get('/student/project/view/{projectId}', [ProjectController::class, 'viewTasks'])->name('project.view.tasks');
     Route::post('/student/project/view/{projectId}/task/{taskId}/done', [ProjectController::class, 'markTaskAsDone'])->name('done.task');
 
     Route::get('/student/project/overview/{id?}', [ProjectController::class, 'showOverview'])->name('project.overview');
-    
+    Route::get('/check-deadlines', [ProjectController::class, 'checkDeadlines'])->name('check.deadlines');
+    Route::get('/student/project/report', [ProjectController::class, 'projectReport'])->name('project.report');
+
     // Fetch notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');

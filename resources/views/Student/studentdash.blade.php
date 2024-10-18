@@ -152,7 +152,7 @@
             </div>
             <div class="modal-body" style="background-color: #E1E3E4; color: #101621;">
                 <!-- Task Form -->
-                <form id="taskForm{{ $value->id }}" action="{{ route('task.submit', ['id' => $value->id]) }}" method="POST">
+                <form id="taskForm{{ $value->id }}" action="{{ route('task.add', ['id' => $value->id]) }}" method="POST">
                     @csrf
                     <div class="form-group">
                         <label for="taskName">Task Name:</label>

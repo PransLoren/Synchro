@@ -269,6 +269,85 @@ class ProjectController extends Controller
         return redirect('student/dashboard')->with('success', 'Task submitted successfully.');
     }
 
+    public function submitTaskForReview(Request $request, $taskId)
+    {
+        $task = Task::findOrFail($taskId);
+
+        if (Auth::id() !== $task->assigned_to) {
+            return redirect()->back()->with('error', 'You are not authorized to submit this task.');
+        }
+
+        try {
+            $task->status = 'submitted';
+            $task->save();
+
+            // Notify the creator
+            $project = $task->project;
+            $creator = $project->users()->wherePivot('role', 'creator')->first();
+
+            if ($creator) {
+                Notification::create([
+                    'user_id' => $creator->id,
+                    'notifiable_type' => Task::class,
+                    'notifiable_id' => $task->id,
+                    'type' => 'task_submitted',
+                    'message' => "Task '{$task->task_name}' has been submitted for your approval.",
+                    'is_read' => false,
+                    'created_at' => now(),
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Task submitted successfully.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to submit task: ' . $e->getMessage());
+        }
+    }
+
+    public function approveTask(Request $request, $taskId)
+    {
+        $task = Task::findOrFail($taskId);
+        $project = $task->project;
+
+        if (Auth::id() !== $project->created_by) {
+            return redirect()->back()->with('error', 'Only the project creator can approve this task.');
+        }
+
+        try {
+            $task->status = 'completed';
+            $task->save();
+
+            return redirect()->back()->with('success', 'Task approved successfully.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to approve task: ' . $e->getMessage());
+        }
+    }
+
+    public function rejectTask($taskId)
+    {
+        $task = Task::findOrFail($taskId);
+    
+        if (Auth::id() !== $task->project->created_by) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $task->status = 'inprogress';
+        $task->save();
+    
+        Notification::create([
+            'user_id' => $task->assigned_to,
+            'notifiable_type' => Task::class,
+            'notifiable_id' => $task->id,
+            'type' => 'task_rejected',
+            'message' => "Your task '{$task->task_name}' was rejected. Please make the necessary changes.",
+            'is_read' => false,
+            'created_at' => now(),
+        ]);
+    
+        return response()->json(['success' => 'Task rejected successfully!']);
+    }
+    
     public function viewTask(Request $request, $taskName) {
         $task = Task::where('task_name', $taskName)->first();
         return response()->json($task);
@@ -293,6 +372,21 @@ class ProjectController extends Controller
             }
         }
     }
+
+    public function projectReport()
+    {
+        $userProjects = Project::where('created_by', Auth::id())->paginate(10);
+
+        $overdueProjects = Project::where('submission_date', '<', now()->toDateString())
+            ->orWhere(function ($query) {
+                $query->where('submission_date', '=', now()->toDateString())
+                    ->where('submission_time', '<', now()->format('H:i:s'));
+            })->get();
+
+        return view('student.project-report', compact('userProjects', 'overdueProjects'));
+    }
+
+    
 
     public function showOverview($id = null)
     {
