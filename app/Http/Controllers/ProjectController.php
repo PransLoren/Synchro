@@ -114,22 +114,25 @@ class ProjectController extends Controller
     }
 
     public function submit($id) {
-        $project = Project::getSingle($id);
+        $project = Project::findOrFail($id);
         $user = Auth::user();
-
+    
         $projectUser = $project->users()->where('user_id', $user->id)->first();
-
+    
         if ($projectUser && $projectUser->pivot->role !== 'creator') {
             return redirect()->back()->with('error', 'You do not have permission to submit this project.');
         }
+    
         try {
-            $project->delete(); 
+            $project->status = 'completed'; // Mark the project as completed
+            $project->save();
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to submit the project: ' . $e->getMessage());
         }
+    
         return redirect('student/dashboard')->with('success', 'Project successfully submitted');
     }
-
+    
     public function invite(Request $request, $projectId) {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
