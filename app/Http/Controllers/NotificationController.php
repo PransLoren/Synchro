@@ -39,4 +39,16 @@ class NotificationController extends Controller
         return response()->json(['unread_count' => $unreadCount]);
     }
 
+    public function getUnreadNotifications()
+    {
+        $notifications = Notification::where('user_id', auth()->id())
+            ->where('is_read', false)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($notifications);
+    }
+
+
+
 }

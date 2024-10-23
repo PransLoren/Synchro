@@ -17,12 +17,22 @@
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid" style="display: flex; justify-content: flex-end; align-items: center;">
             <ul class="navbar-nav" style="display: flex; gap: 30px; align-items: center; margin-left: auto;">
-                <li class="nav-item" style="position: relative;">
-                    <a href="{{ route('notifications.index') }}" class="btn btn-primary" style="font-size: 14px;">
-                        Notifications
-                        <span id="notification-count" class="badge badge-warning">7</span> 
-                    </a>
-                </li>
+            <li class="nav-item dropdown" style="position: relative;">
+                <a class="nav-link" href="#" id="notificationDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-bell" style="font-size: 24px; color: #2e5caf;"></i>
+                    <span id="notification-count" class="badge badge-notif">7</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
+                    <h6 class="dropdown-header">Notifications</h6>
+                    <div class="notification-list" id="notificationList"></div>
+                    <div class="dropdown-footer text-center">
+                        <a href="{{ route('notifications.index') }}">View all notifications</a>
+                    </div>
+                </div>
+
+            </li>
+
                 <li class="nav-item">
                     <a href="{{ url('student/profile') }}" 
                        class="up @if(Request::segment(2) == 'profile') active @endif"
@@ -243,34 +253,88 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        // Function to fetch unread notifications count
-        function fetchUnreadNotificationsCount() {
+    $(document).ready(function () {
+        function fetchNotifications() {
             $.ajax({
-                url: "{{ route('notifications.unread.count') }}", // Fetch unread count
+                url: "{{ route('notifications.unread') }}",
                 method: 'GET',
-                success: function(response) {
-                    // Update the notification count badge
-                    $('#notification-count').text(response.unread_count);
+                success: function (notifications) {
+                    console.log('Fetched Notifications:', notifications); 
+                    let notificationList = '';
+                    if (Array.isArray(notifications) && notifications.length > 0) {
+                        notifications.forEach(notification => {
+                            console.log('Notification Object:', notification); 
+
+                            const message = notification.message || 'No message found';
+                            const createdAt = formatTimestamp(notification.created_at);
+
+                            notificationList += `
+                                <a href="#" class="dropdown-item">
+                                    <strong>${message}</strong>
+                                    <small class="text-muted d-block">${createdAt}</small>
+                                </a>`;
+                        });
+                    } else {
+                        notificationList = '<p class="text-center p-2">No new notifications</p>';
+                    }
+
+                    $('#notificationList').html(notificationList);
+                    $('#notification-count').text(notifications.length);
                 },
-                error: function(error) {
-                    console.error('Failed to fetch unread notifications count', error);
+                error: function (error) {
+                    console.error('Failed to fetch notifications:', error);
                 }
             });
         }
 
-        // Fetch unread count every 30 seconds
-        setInterval(fetchUnreadNotificationsCount, 30000);
+        function fetchUnreadNotificationsCount() {
+            $.ajax({
+                url: "{{ route('notifications.unread.count') }}",
+                method: 'GET',
+                success: function (response) {
+                    $('#notification-count').text(response.unread_count);
+                },
+                error: function (error) {
+                    console.error('Failed to fetch unread notifications count:', error);
+                }
+            });
+        }
 
-        // Initial fetch on page load
-        fetchUnreadNotificationsCount();
-        $('.tab').click(function() {
-            const tabId = $(this).data('tab');
-            $('.card').hide();
-            $(`#${tabId}-content`).show();
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString('en-US', {
+                hour: 'numeric', minute: 'numeric', second: 'numeric',
+                year: 'numeric', month: 'short', day: 'numeric'
+            });
+        }
+
+        $('#notificationDropdown').on('click', function () {
+            fetchNotifications(); 
+            fetchUnreadNotificationsCount(); 
         });
+
+        setInterval(fetchUnreadNotificationsCount, 30000);
+        fetchUnreadNotificationsCount(); 
+
+    
+        $('.tab').click(function () {
+            const tabId = $(this).data('tab'); 
+            $('.card').hide(); 
+            $(`#${tabId}-content`).show(); 
+            $('.tab').removeClass('active'); 
+            $(this).addClass('active'); 
+        });
+
+        // Ensure correct tab content is shown on page load
+        const activeTabId = $('.tab.active').data('tab');
+        if (activeTabId) {
+            $(`#${activeTabId}-content`).show(); 
+        } else {
+            $('#project-list-content').show(); 
+        }
     });
 </script>
+
 
 @endsection
 <style>
@@ -441,6 +505,73 @@ ul, ol, li {
     font-size: 10px;
     height: 30px;
 }
+
+/* Notification Dropdown */
+.notification-dropdown {
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto; /* Make the dropdown scrollable if content exceeds height */
+    padding: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.notification-dropdown h6 {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    padding-left: 10px;
+    text-align: left;
+}
+
+/* Each Notification Item */
+.dropdown-item {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 10px;
+    font-size: 14px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item small {
+    display: block;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* Footer Link */
+.dropdown-footer a {
+    display: inline-block;
+    margin-top: 8px;
+    font-weight: 500;
+    color: #2e5caf;
+    text-decoration: none;
+}
+
+.dropdown-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Scrollbar Styling */
+.notification-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-dropdown::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+.notification-dropdown::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
 tr {
     /* background-color: #f7f7f7; */
 }

@@ -27,12 +27,11 @@ class ProjectInvitationController extends Controller
             return back()->with('error', 'User with provided email not found.');
         }
 
-        // Check if the user is already a member
+     
         if ($project->users->contains($user)) {
             return back()->with('error', 'User is already a member of this project.');
         }
 
-        // Check if there's already a pending invitation
         $invitation = ProjectInvitation::where('project_id', $project->id)
             ->where('email', $request->email)
             ->where('status', ProjectInvitation::STATUS_PENDING)
@@ -41,25 +40,20 @@ class ProjectInvitationController extends Controller
         if ($invitation) {
             return back()->with('error', 'User has already been invited and the invitation is pending.');
         }
-
-        // Create a new invitation
         ProjectInvitation::create([
             'project_id' => $project->id,
             'email' => $request->email,
             'status' => ProjectInvitation::STATUS_PENDING,
         ]);
 
-        // Send invitation via email
-        $user->notify(new EmailProjectInvitationNotification($project)); // Make sure this notification class matches the Project model type
-
+        $user->notify(new EmailProjectInvitationNotification($project)); 
         return back()->with('success', 'Invitation sent successfully.');
     }
 
     public function acceptInvitation(Project $project)
     {
-        $user = auth()->user();
+        $user = auth()->user(); 
 
-        // Find the invitation
         $invitation = ProjectInvitation::where('project_id', $project->id)
             ->where('email', $user->email)
             ->where('status', ProjectInvitation::STATUS_PENDING)
@@ -69,24 +63,49 @@ class ProjectInvitationController extends Controller
             return back()->with('error', 'Invalid or expired invitation.');
         }
 
-        // Attach the user to the project
         $project->users()->syncWithoutDetaching([$user->id]);
-
-        // Update the invitation status
         $invitation->update(['status' => ProjectInvitation::STATUS_ACCEPTED]);
+
+        $creator = User::find($project->created_by); 
+
+        if ($creator) {
+            \App\Models\Notification::create([
+                'user_id' => $creator->id,
+                'notifiable_type' => Project::class,
+                'notifiable_id' => $project->id,
+                'type' => 'invitation_accepted',
+                'message' => "The user '{$user->name}' has accepted the invitation to join project '{$project->class_name}'.",
+                'is_read' => false,
+                'created_at' => now(),
+            ]);
+        }
 
         return redirect()->route('userdashboard')->with('success', 'Invitation accepted successfully!');
     }
 
+
     public function rejectInvitation(ProjectInvitation $invitation)
     {
-        // Update the invitation status to rejected
         $invitation->update(['status' => ProjectInvitation::STATUS_REJECTED]);
 
-        // Optional: Notify the user
         $user = User::where('email', $invitation->email)->first();
+        $project = Project::find($invitation->project_id);
+        $creator = User::find($project->created_by);
+
+        if ($creator && $user) {
+            \App\Models\Notification::create([
+                'user_id' => $creator->id,
+                'notifiable_type' => Project::class,
+                'notifiable_id' => $project->id,
+                'type' => 'invitation_rejected',
+                'message' => "The user '{$user->name}' has rejected the invitation to join project '{$project->class_name}'.",
+                'is_read' => false,
+                'created_at' => now(),
+            ]);
+        }
+
         if ($user) {
-            $user->notify(new EmailRejectInvitationNotification($invitation->project));
+            $user->notify(new EmailRejectInvitationNotification($project));
         }
 
         return redirect()->route('student.dashboard')->with('success', 'Invitation rejected successfully.');
