@@ -11,10 +11,10 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectInvitationController;
 
-Route::get('/', [WebAuthController::class, 'loginuser'])->name('loginuser');  // Shows login form
+Route::get('/', [WebAuthController::class, 'loginuser'])->name('loginuser'); 
 Route::get('/registration', [WebAuthController::class, 'registration'])->name('registration');
-Route::get('/login', [WebAuthController::class, 'loginuser'])->name('loginuser'); // Show login form
-Route::post('/login', [WebAuthController::class, 'Authlogin'])->name('login'); // Handles login
+Route::get('/login', [WebAuthController::class, 'loginuser'])->name('loginuser'); 
+Route::post('/login', [WebAuthController::class, 'Authlogin'])->name('login');
 Route::post('/register', [WebAuthController::class, 'register'])->name('register');
 Route::get('/logout', [WebAuthController::class, 'logout'])->name('logout');
 
@@ -26,24 +26,19 @@ Route::post('/reset/{token}', [WebAuthController::class, 'PostReset']);
 
 // Email Verification Routes
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
-    // Find the user by ID
     $user = \App\Models\User::find($id);
 
-    // Check if user exists
     if (!$user) {
         return redirect('/')->with('error', 'Invalid verification link.');
     }
-
-    // Verify the hash matches the user's email hash
     if (!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
         return redirect('/')->with('error', 'Invalid verification link.');
     }
 
-    // Mark the user as verified
     $user->email_verified_at = now();
     $user->save();
 
-    // Redirect to login page with success message
+
     return redirect('/')->with('success', 'Email verified successfully. Please log in.');
 })->middleware(['signed'])->name('verification.verify');
 
@@ -95,7 +90,7 @@ Route::group(['middleware' => ['auth', 'student']], function () {
     Route::post('student/project/project/edit/{id}', [ProjectController::class, 'update']);
     Route::post('student/project/project/delete/{id}', [ProjectController::class, 'delete']);
     Route::post('student/project/project/submit/{id}', [ProjectController::class, 'submit']);
-    Route::post('/invite/{projectId}', [ProjectController::class, 'invite'])->name('invite');
+    Route::post('/projects/{project}/invite', [ProjectInvitationController::class, 'invite'])->name('projects.invite');
     Route::post('/project/{id}/task/add', [ProjectController::class, 'tasksubmit'])->name('task.add');
     Route::post('/task/start/{taskId}', [ProjectController::class, 'startTask'])->name('task.start');
     Route::post('/task/{taskId}/submit', [ProjectController::class, 'submitTaskForReview'])->name('task.submit');
@@ -105,9 +100,12 @@ Route::group(['middleware' => ['auth', 'student']], function () {
     Route::post('/project/{projectId}/task/{taskId}/done', [ProjectController::class, 'markTaskAsDone'])->name('task.done');
     Route::get('/student/project/view/{projectId}', [ProjectController::class, 'viewTasks'])->name('project.view.tasks');
     Route::post('/student/project/view/{projectId}/task/{taskId}/done', [ProjectController::class, 'markTaskAsDone'])->name('done.task');
+    Route::post('/projects/markasdone/{id}', [ProjectController::class, 'markAsDone'])->name('projects.markasdone');
+    Route::delete('/projects/delete/{id}', [ProjectController::class, 'destroy'])->name('projects.delete');
+
 
     Route::get('/student/project/overview/{id?}', [ProjectController::class, 'showOverview'])->name('project.overview');
-    Route::get('/check-deadlines', [ProjectController::class, 'checkDeadlines'])->name('check.deadlines');
+    Route::get('/projects/check-deadlines', [ProjectController::class, 'checkDeadlines']);
     Route::get('/student/project/report', [ProjectController::class, 'projectReport'])->name('project.report');
 
     // Fetch notifications

@@ -3,61 +3,69 @@
 @section('style')
   <style type="text/css">
     .content-wrapper {
-      background-color: #d1eaf6; 
-      color: #000; 
-      min-height: 100vh; 
-      padding: 20px; 
+        background-color: #a4c6e0; 
+        color: #000;
+        min-height: 100vh;
+        padding: 20px;
     }
 
     .card-primary {
-      border: 1px solid #357ca5;
-      background-color: #f8fafc;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-      margin-top: 20px; 
+        border: 1px solid #1a3c5a; 
+        background-color: #e1eaf2; 
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    .card-header {
+        background-color: #3b5998 !important; 
+        color: white !important;
+        font-weight: bold;
+        font-size: 18px;
+        padding: 10px 15px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
     }
 
     .btn-primary {
-      background-color: #357ca5;
-      border-color: #357ca5;
-      font-size: 14px;
-      padding: 5px 15px;
-      height: 36px;
-      border-radius: 6px;
-      transition: background-color 0.3s, transform 0.2s;
+        background-color: #3b5998 !important;
+        border-color: #3b5998 !important;
+        font-size: 14px;
+        padding: 5px 15px;
+        height: 36px;
+        border-radius: 6px;
+        transition: background-color 0.3s, transform 0.2s;
+        color: #fff; 
+        font-weight: bold;
     }
 
     .btn-primary:hover {
-      background-color: #2a5f7d;
-      border-color: #2a5f7d;
-      transform: scale(1.05); 
+        background-color: #2d4373 !important;
+        border-color:  #2d4373 !important;
+        transform: scale(1.05);
     }
 
     .form-group label {
-      color: #357ca5;
-      font-weight: bold;
-      font-size: 14px; 
+        color: #1a3c5a; 
+        font-weight: bold;
+        font-size: 14px;
     }
 
     .form-control {
-      height: 36px;
-      font-size: 14px;
-      padding: 5px 10px;
-      border-radius: 6px;
+        height: 36px;
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 6px;
     }
 
     textarea.form-control {
-      height: 120px; 
-      resize: none; 
+        height: 120px;
+        resize: none;
     }
 
     .card-footer {
-      text-align: right;
-      padding: 10px 15px;
-    }
-
-    .sidebar {
-      min-height: 100vh; 
+        text-align: right;
+        padding: 10px 15px;
     }
   </style>
 @endsection
@@ -78,30 +86,34 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-8 offset-md-2"> <!-- Centering the form -->
+                <div class="col-md-8 offset-md-2"> 
                     @include('message')
                     <div class="card card-primary">
+                        <!-- Header -->
+                        <div class="card-header">
+                            Add New Project
+                        </div>
+
+                        <!-- Form -->
                         <form method="post" action="" enctype="multipart/form-data">
                            {{ csrf_field() }}
                             <div class="card-body">
-
                                 <div class="form-group">
                                     <label>Project Name <span style="color:red">*</span></label>
-                                    <input type="text" class="form-control" name="class_name" id="getproject"
-                                           value="{{ $getRecord->project->name ?? '' }}" 
+                                    <input type="text" class="form-control" name="class_name" 
                                            placeholder="Enter project name">
                                 </div>
 
                                 <div class="form-group">
                                     <label>Submission Date <span style="color:red">*</span></label>
-                                    <input type="date" class="form-control" name="submission_date" required 
-                                           id="submission_date">
+                                    <input type="date" class="form-control" name="submission_date" 
+                                           id="submission_date" required>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Submission Time <span style="color:red">*</span></label>
-                                    <input type="time" class="form-control" name="submission_time" required 
-                                           id="submission_time">
+                                    <input type="time" class="form-control" name="submission_time" 
+                                           id="submission_time" required>
                                 </div>
 
                                 <div class="form-group">
@@ -109,9 +121,9 @@
                                     <textarea name="description" class="form-control" 
                                               placeholder="Enter project description"></textarea>
                                 </div>
-
                             </div>
 
+                            <!-- Footer with Submit Button -->
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
@@ -128,8 +140,8 @@
 @section('script')
    <script type="text/javascript">
         $(function () {
-            const today = new Date().toISOString().split('T')[0]; 
-            $('#submission_date').attr('min', today); 
+            const today = new Date().toISOString().split('T')[0];
+            $('#submission_date').attr('min', today);
         });
    </script>
 @endsection

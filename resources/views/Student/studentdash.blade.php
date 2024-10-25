@@ -132,6 +132,7 @@
                                     <tr>
                                         <th>Project Name</th>
                                         <th>Submission Date</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -139,6 +140,14 @@
                                         <tr>
                                             <td>{{ $project->class_name }}</td>
                                             <td>{{ $project->submission_date }}</td>
+                                            <td>
+                                                <form action="{{ route('projects.markasdone', ['id' => $project->id]) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="fas fa-check"></i> 
+                                                    </button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -157,6 +166,7 @@
                                     <tr>
                                         <th>Project Name</th>
                                         <th>Completed At</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -164,12 +174,22 @@
                                         <tr>
                                             <td>{{ $project->class_name }}</td>
                                             <td>{{ $project->updated_at }}</td>
+                                            <td>
+                                                <form action="{{ route('projects.delete', ['id' => $project->id]) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
+
 
                 </div>
             </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Project;
 use App\Models\ProjectInvitation;
+use App\Models\Notification; 
 use Illuminate\Http\Request;
 use App\Notifications\EmailProjectInvitationNotification;
 use App\Notifications\EmailAcceptInvitationNotification;
@@ -14,41 +15,56 @@ class ProjectInvitationController extends Controller
 {
     public function invite(Request $request, Project $project)
     {
-        // Validate user input
+        if (auth()->id() !== $project->created_by) {
+            return redirect()->back()->with('error', 'Only the project creator can invite members.');
+        }
+
+        // Validate the email input
         $request->validate([
-            'email' => 'required|email'
+            'email' => 'required|email',
         ]);
 
-        // Find user by email
-        $user = User::where('email', $request->email)->first();
+        try {
+            $user = User::where('email', $request->email)->firstOrFail();
 
-        // Check if the user exists
-        if (!$user) {
-            return back()->with('error', 'User with provided email not found.');
+            if ($project->users->contains($user)) {
+                return redirect()->back()->with('error', 'User is already a member of this project.');
+            }
+
+            $existingInvitation = ProjectInvitation::where('project_id', $project->id)
+                ->where('email', $request->email)
+                ->where('status', ProjectInvitation::STATUS_PENDING)
+                ->first();
+
+            if ($existingInvitation) {
+                return redirect()->back()->with('error', 'An invitation is already pending for this user.');
+            }
+
+            ProjectInvitation::create([
+                'project_id' => $project->id,
+                'email' => $request->email,
+                'status' => ProjectInvitation::STATUS_PENDING,
+            ]);
+
+            $user->notify(new EmailProjectInvitationNotification($project));
+
+            Notification::create([
+                'user_id' => $project->created_by,
+                'notifiable_type' => Project::class,
+                'notifiable_id' => $project->id,
+                'type' => 'invitation_sent',
+                'message' => "An invitation has been sent to '{$user->name}' for the project '{$project->class_name}'.",
+                'is_read' => false,
+                'created_at' => now(),
+            ]);
+
+            return redirect()->back()->with('success', 'Invitation sent successfully.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to send invitation: ' . $e->getMessage());
         }
-
-     
-        if ($project->users->contains($user)) {
-            return back()->with('error', 'User is already a member of this project.');
-        }
-
-        $invitation = ProjectInvitation::where('project_id', $project->id)
-            ->where('email', $request->email)
-            ->where('status', ProjectInvitation::STATUS_PENDING)
-            ->first();
-
-        if ($invitation) {
-            return back()->with('error', 'User has already been invited and the invitation is pending.');
-        }
-        ProjectInvitation::create([
-            'project_id' => $project->id,
-            'email' => $request->email,
-            'status' => ProjectInvitation::STATUS_PENDING,
-        ]);
-
-        $user->notify(new EmailProjectInvitationNotification($project)); 
-        return back()->with('success', 'Invitation sent successfully.');
     }
+
 
     public function acceptInvitation(Project $project)
     {

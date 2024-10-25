@@ -124,7 +124,7 @@ class ProjectController extends Controller
         }
     
         try {
-            $project->status = 'completed'; // Mark the project as completed
+            $project->status = 'completed';
             $project->save();
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to submit the project: ' . $e->getMessage());
@@ -133,40 +133,7 @@ class ProjectController extends Controller
         return redirect('student/dashboard')->with('success', 'Project successfully submitted');
     }
     
-    public function invite(Request $request, $projectId) {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-        ]);
-    
-        if ($validator->fails()) {
-            throw ValidationException::withMessages($validator->errors()->all());
-        }
-    
-        $invitedUser = User::where('email', $request->email)->firstOrFail();
-        $project = Project::findOrFail($projectId);
-    
-        try {
-            $project->users()->attach($invitedUser->id, ['role' => 'member']); 
-
-            Notification::create([
-                'user_id' => $invitedUser->id,
-                'notifiable_type' => Project::class,
-                'notifiable_id' => $project->id,
-                'type' => 'project_invitation',
-                'message' => "You have been invited to join the project '{$project->class_name}'.",
-                'is_read' => false,
-                'created_at' => now(),
-            ]);
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with(['error' => 'Failed to send invitation: ' . $e->getMessage()]);
-        }
-    
-        return redirect()->back()->with(['success' => 'Invitation sent successfully.']);
-    }
-
     public function viewTasks($projectId) {
-        // Load the project with tasks and their assigned users
         $project = Project::with(['tasks.assignedUser'])->findOrFail($projectId);
         $tasks = $project->tasks;
     
@@ -357,10 +324,12 @@ class ProjectController extends Controller
     }
 
     public function checkDeadlines() {
-        $projects = Project::whereDate('submission_date', '=', Carbon::now()->addDay()->toDateString())
-                            ->where('submission_time', '>=', Carbon::now()->format('H:i'))
+        $tomorrow = Carbon::now()->addDay()->toDateString();
+    
+        $projects = Project::whereDate('submission_date', '=', $tomorrow)
+                            ->whereNull('deleted_at')
                             ->get();
-
+    
         foreach ($projects as $project) {
             foreach ($project->users as $user) {
                 Notification::create([
@@ -374,29 +343,57 @@ class ProjectController extends Controller
                 ]);
             }
         }
+    
+        \Log::info('Project deadlines checked successfully at: ' . now());
     }
-
+    
     public function projectReport()
     {
-        $userProjects = Project::where('created_by', Auth::id())->paginate(10);
-
-        $overdueProjects = Project::where('submission_date', '<', now()->toDateString())
-            ->orWhere(function ($query) {
-                $query->where('submission_date', '=', now()->toDateString())
-                    ->where('submission_time', '<', now()->format('H:i:s'));
-            })->get();
+        $userProjects = Project::where('created_by', Auth::id())
+                            ->whereNull('deleted_at')
+                            ->paginate(10);
+        $overdueProjects = Project::whereNull('deleted_at')
+                                ->where(function ($query) {
+                                    $query->where('submission_date', '<', now()->toDateString())
+                                            ->orWhere(function ($q) {
+                                                $q->where('submission_date', '=', now()->toDateString())
+                                                ->where('submission_time', '<', now()->format('H:i:s'));
+                                            });
+                                })->get();
 
         return view('student.project-report', compact('userProjects', 'overdueProjects'));
     }
 
+
+    public function markAsDone($id)
+    {
+        $project = Project::find($id);
+        if ($project) {
+            $project->status = 'completed'; 
+            $project->save();
+        }
+        return redirect()->back()->with('success', 'Project marked as done!');
+    }
     
+    public function destroy($id)
+    {
+        $project = Project::find($id);
+        if ($project) {
+            $project->delete();
+        }
+        return redirect()->back()->with('success', 'Project deleted successfully!');
+    }
+       
 
     public function showOverview($id = null)
     {
-        $projects = auth()->user()->projects;
-
-        $currentProject = $id ? Project::with(['users', 'tasks', 'creator'])->find($id) : ($projects->first() ?? null);
+        $projects = auth()->user()->projects()->whereNull('deleted_at')->get();
+        $currentProject = $id ? Project::with(['users', 'tasks', 'creator'])
+                                ->whereNull('deleted_at')
+                                ->find($id) 
+                            : ($projects->first() ?? null);
 
         return view('Student.project-overview', compact('projects', 'currentProject'));
     }
+
 }

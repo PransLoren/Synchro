@@ -4,19 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
-    // Explicitly set the table name
-    protected $table = 'project';  // If your table is named 'project'
+    protected $table = 'project'; 
 
     protected $fillable = [
         'class_name', 'description', 'submission_date', 'submission_time', 'created_by', 'is_delete'
     ];
 
-    // Relationships
     public function users()
     {
         return $this->belongsToMany(User::class, 'project_user', 'project_id', 'user_id')
@@ -33,7 +33,6 @@ class Project extends Model
         return $this->hasMany(ProjectInvitation::class, 'project_id');
     }
 
-    // Static methods to get records
     static public function getSingle($id)
     {
         return self::find($id);
@@ -48,7 +47,6 @@ class Project extends Model
                     ->paginate(20);
     }
 
-    // Document path getter
     public function getDocument()
     {
         if (!empty($this->document_file) && file_exists('upload/project/' . $this->document_file)) {

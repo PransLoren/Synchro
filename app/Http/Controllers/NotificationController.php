@@ -9,7 +9,6 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        // Fetch all notifications for the authenticated user
         $notifications = Notification::where('user_id', auth()->id())
                                       ->orderBy('created_at', 'desc')
                                       ->get();
@@ -31,7 +30,6 @@ class NotificationController extends Controller
 
     public function getUnreadNotificationsCount()
     {
-        // Fetch unread notifications count for the authenticated user
         $unreadCount = Notification::where('user_id', auth()->id())
                                 ->where('is_read', false)
                                 ->count();
