@@ -13,28 +13,28 @@
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
     </div>
+
     <!-- Notification and Profile -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid" style="display: flex; justify-content: flex-end; align-items: center;">
             <ul class="navbar-nav" style="display: flex; gap: 30px; align-items: center; margin-left: auto;">
-            <li class="nav-item dropdown" style="position: relative;">
-                <a class="nav-link" href="#" id="notificationDropdown" role="button"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-bell" style="font-size: 24px; color: #2e5caf;"></i>
-                    <span id="notification-count" class="badge badge-notif">7</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
-                    <h6 class="dropdown-header">Notifications</h6>
-                    <div class="notification-list" id="notificationList"></div>
-                    <div class="dropdown-footer text-center">
-                        <a href="{{ route('notifications.index') }}">View all notifications</a>
+                <li class="nav-item dropdown" style="position: relative;">
+                    <a class="nav-link" href="#" id="notificationDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-bell" style="font-size: 24px; color: #2e5caf;"></i>
+                        <span id="notification-count" class="badge badge-notif">7</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right notification-dropdown"
+                        aria-labelledby="notificationDropdown">
+                        <h6 class="dropdown-header">Notifications</h6>
+                        <div class="notification-list" id="notificationList"></div>
+                        <div class="dropdown-footer text-center">
+                            <a href="{{ route('notifications.index') }}">View all notifications</a>
+                        </div>
                     </div>
-                </div>
-
-            </li>
-
+                </li>
                 <li class="nav-item">
-                    <a href="{{ url('student/profile') }}" 
+                    <a href="{{ url('student/profile') }}"
                        class="up @if(Request::segment(2) == 'profile') active @endif"
                        style="font-family: 'Poppins', sans-serif; background-color: white; color: #2e5caf; font-size: 18px;">
                         Profile
@@ -44,21 +44,16 @@
         </div>
     </nav>
 
-
-
-<!-- Project Report Title -->
-<h1 class="report-title" style="margin-left:4rem; color:#2e5caf; font-size: 28px; font-family: 'Poppins', sans-serif;">
+    <h1 class="report-title" style="margin-left:4rem; color:#2e5caf; font-size: 28px; font-family: 'Poppins', sans-serif;">
         Project Report
     </h1>
 
-    <!-- Tabs for Project List, Overdue, and Completed Projects -->
     <div class="tabs" style="margin-left: 4rem; margin-bottom: 20px;">
         <a href="#project-list" class="tab active" data-tab="project-list">Project List</a>
         <a href="#overdue-projects" class="tab" data-tab="overdue-projects">Overdue Projects</a>
         <a href="#completed-projects" class="tab" data-tab="completed-projects">Completed Projects</a>
     </div>
 
-    <!-- Project Sections -->
     <section class="content">
         <div class="container-fluid">
             <div class="row">
@@ -71,57 +66,70 @@
                             <h3 class="card-title">Project List</h3>
                         </div>
                         <div class="card-body p-0">
-                            <table class="table table-striped table-centered">
-                                <thead>
-                                    <tr>
-                                        <th>Project Name</th>
-                                        <th>Submission Date</th>
-                                        <th>Submission Time</th>
-                                        <th>Add Tasks</th>
-                                        <th>Action</th>
-                                        <th>Edit Project</th>
-                                        <th>Invite Users</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($userProjects as $value)
-                                        <tr style="background-color: {{ $loop->index % 2 === 0 ? '#edf2fb' : '#dbe7f0' }};">
-                                            <td><a href="{{ route('project.view.tasks', ['projectId' => $value->id]) }}">{{ $value->class_name }}</a></td>
-                                            <td>{{ $value->submission_date }}</td>
-                                            <td>{{ $value->submission_time }}</td>
-                                            <td>
-                                                @if(Auth::id() == $value->created_by)
-                                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taskModal{{ $value->id }}">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                @endif
-                                            </td>
-                                            <td>
+                        <table class="table table-striped table-centered">
+                            <thead>
+                                <tr>
+                                    <th>Project Name</th>
+                                    <th>Submission Date</th>
+                                    <th>Submission Time</th>
+                                    <th>Add Tasks</th>
+                                    <th>Action</th>
+                                    <th>Edit Project</th>
+                                    <th>Invite Users</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($userProjects as $value)
+                                    <tr style="background-color: {{ $loop->index % 2 === 0 ? '#edf2fb' : '#dbe7f0' }};">
+                                        <td>
+                                            <a href="{{ route('project.view.tasks', ['projectId' => $value->id]) }}">
+                                                {{ $value->class_name }}
+                                            </a>
+                                        </td>
+                                        <td>{{ $value->submission_date }}</td>
+                                        <td>{{ $value->submission_time }}</td>
+
+                                        <!-- Conditionally Render Buttons Based on Creator -->
+                                        <td>
+                                            @if(auth()->id() == $value->created_by)
+                                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taskModal{{ $value->id }}">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if(auth()->id() == $value->created_by)
                                                 <form action="{{ url('student/project/project/submit/'.$value->id) }}" method="POST">
                                                     @csrf
                                                     <button type="submit" class="btn btn-primary">
                                                         <i class="fas fa-check"></i>
                                                     </button>
                                                 </form>
-                                            </td>
-                                            <td>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if(auth()->id() == $value->created_by)
                                                 <a href="{{ url('student/project/project/edit/'.$value->id) }}" class="btn btn-warning">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                            </td>
-                                            <td>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if(auth()->id() == $value->created_by)
                                                 <button type="button" class="btn btn-invite" data-toggle="modal" data-target="#inviteUserModal{{ $value->id }}">
                                                     Invite User
                                                 </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
                         </div>
                     </div>
 
-                    <!-- Overdue Projects Section -->
+                    <!-- Overdue and Completed Projects Sections -->
                     <div class="card" id="overdue-projects-content" style="display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Overdue Projects</h3>
@@ -155,7 +163,6 @@
                         </div>
                     </div>
 
-                    <!-- Completed Projects Section -->
                     <div class="card" id="completed-projects-content" style="display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Completed Projects</h3>
@@ -189,7 +196,6 @@
                             </table>
                         </div>
                     </div>
-
 
                 </div>
             </div>
