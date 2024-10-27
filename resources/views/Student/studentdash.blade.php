@@ -131,29 +131,30 @@
                         </div>
                     </div>
 
+                    <!-- Overdue Projects Section -->
                     <div class="card" id="overdue-projects-content" style="display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Overdue Projects</h3>
                         </div>
                         <div class="card-body p-0">
-                            <table class="table table-striped">
+                            <table class="table table-striped table-centered">
                                 <thead>
                                     <tr>
                                         <th>Project Name</th>
                                         <th>Submission Date</th>
-                                        <th></th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($overdueProjects as $project)
-                                        <tr>
+                                        <tr style="background-color: {{ $loop->index % 2 === 0 ? '#edf2fb' : '#dbe7f0' }};">
                                             <td>{{ $project->class_name }}</td>
                                             <td>{{ $project->submission_date }}</td>
                                             <td>
                                                 <form action="{{ route('projects.markasdone', ['id' => $project->id]) }}" method="POST">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-success">
-                                                        <i class="fas fa-check"></i> 
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-check"></i>
                                                     </button>
                                                 </form>
                                             </td>
@@ -164,22 +165,23 @@
                         </div>
                     </div>
 
+                    <!-- Completed Projects Section -->
                     <div class="card" id="completed-projects-content" style="display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Completed Projects</h3>
                         </div>
                         <div class="card-body p-0">
-                            <table class="table table-striped">
+                            <table class="table table-striped table-centered">
                                 <thead>
                                     <tr>
                                         <th>Project Name</th>
                                         <th>Completed At</th>
-                                        <th></th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($completedProjects as $project)
-                                        <tr>
+                                        <tr style="background-color: {{ $loop->index % 2 === 0 ? '#edf2fb' : '#dbe7f0' }};">
                                             <td>{{ $project->class_name }}</td>
                                             <td>{{ $project->updated_at }}</td>
                                             <td>
@@ -197,7 +199,6 @@
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

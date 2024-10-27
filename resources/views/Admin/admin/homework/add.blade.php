@@ -3,7 +3,7 @@
 @section('style')
   <style type="text/css">
     .content-wrapper {
-        background-color: #a4c6e0; 
+        background-color: #FFFFFF; 
         color: #000;
         min-height: 100vh;
         padding: 20px;
