@@ -13,6 +13,11 @@ class Project extends Model
 
     protected $table = 'project'; 
 
+    protected $casts = [
+        'created_date' => 'datetime:Y-m-d H:i:s',
+        'submission_date' => 'datetime:Y-m-d H:i:s',
+    ];
+
     protected $fillable = [
         'class_name', 'description', 'submission_date', 'submission_time', 'created_by', 'is_delete'
     ];

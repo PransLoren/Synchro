@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Project</h1>
+                    <h1>{{ $header_title }}</h1>
                 </div>
             </div>
         </div>
@@ -15,31 +15,32 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    @include ('message')
+                    @include('message')
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-list"></i> Project List
                             </h3>
                         </div>
-                        <!-- /.card-header -->
                         <div class="card-body p-0">
                             <table class="table table-striped" style="background-color: #edf2fb;">
                                 <thead>
                                     <tr>
                                         <th><i class="fas fa-file"></i> Project Name</th>
-                                        <th><i class="far fa-calendar-alt"></i> Project Date</th>
                                         <th><i class="far fa-calendar-alt"></i> Submission Date</th>
-                                        <th><i class="fas fa-info-circle"></i> Description</th>
+                                        <th><i class="far fa-clock"></i> Submission Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($getRecord as $value)
                                     <tr style="background-color: #eff8ff;">
                                         <td>{{ $value->class_name }}</td>
-                                        <td>{{ date('d-m-Y', strtotime($value->project_date)) }}</td>
-                                        <td>{{ date('d-m-Y', strtotime($value->submission_date)) }}</td>
-                                        <td>{{ $value->description }}</td>
+                                        <td>
+                                            {{ $value->submission_date ? $value->submission_date->format('Y-m-d') : 'Not Set' }}
+                                        </td>
+                                        <td>
+                                            {{ $value->submission_time ? \Carbon\Carbon::parse($value->submission_time)->format('H:i:s') : 'Not Set' }}
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
