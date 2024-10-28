@@ -4,9 +4,10 @@
 <div class="container mt-4">
     <div class="row">
         <!-- Left Column: Project List -->
+         
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header" style="background-color: #1A1A2E; color: #FFFFFF;">
+                <div class="card-header" style="background-color: #425673; color: #FFFFFF;">
                     <h4>My Projects</h4>
                 </div>
                 <div class="card-body">
@@ -18,7 +19,7 @@
                                 <li class="list-group-item 
                                     @if($currentProject && $project->id == $currentProject->id) active @endif">
                                     <a href="{{ route('project.overview', ['id' => $project->id]) }}" 
-                                       style="text-decoration: none; color: inherit; display: block;">
+                                       style="text-decoration: none; color: inherit; display: block; ">
                                         {{ $project->class_name }}
                                     </a>
                                 </li>
@@ -33,7 +34,7 @@
         <div class="col-md-8">
             @if($currentProject)
                 <div class="card">
-                    <div class="card-header" style="background-color: #1A1A2E; color: #FFFFFF;">
+                    <div class="card-header" style="background-color: #425673; color: #FFFFFF;">
                         <h4>{{ $currentProject->class_name }} - Project Details</h4>
                     </div>
                     <div class="card-body">
@@ -76,3 +77,11 @@
     </div>
 </div>
 @endsection
+<style>
+        body, .container, .card, .card-header, .card-body, .list-group, .list-group-item, h4, h5, p {
+        font-family: 'Poppins', sans-serif;
+    }
+    .list-group{
+        background-color: #425673;
+    }
+</style>

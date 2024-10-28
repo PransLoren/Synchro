@@ -61,7 +61,7 @@
               </button>
             </a>
           </div>
-          <img src="uploads/project/WW.png" alt="Your Image" class="styled-image" /> 
+          <img src="uploads/project/NEW.png" alt="Your Image" class="styled-image" /> 
              <button class="btnf1" >
                     Progress at a glance
              </button>

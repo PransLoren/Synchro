@@ -334,7 +334,7 @@ input:-webkit-autofill {
     display: block;
     margin: 6 auto;
     margin-right: -6rem;
-    margin-top: 2rem;
+    margin-top: 4rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 .logo-image {

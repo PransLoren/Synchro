@@ -11,7 +11,7 @@
     <!-- Sidebar user panel (optional) -->
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
       <div class="info">
-        <a href="#" class="d-block" style="color: #EAEAEA;">Hi, {{ Auth::user()->name }}</a>
+        <a href="#" class="d-block" style="color: #EAEAEA; font-family: 'Poppins', sans-serif;">Hi, {{ Auth::user()->name }}</a>
       </div>
     </div>
 
@@ -22,7 +22,7 @@
       @if(Auth::user()->user_type == 1)
           <li class="nav-item">
             <a href="{{ url('admin/dashboard') }}" class="nav-link @if(Request::segment(2) =='dashboard') active @endif" style="color: #EAEAEA;">
-              <i class="nav-icon fas fa-tachometer-alt" style="color: white;"></i>
+              <i class="nav-icon fas fa-tachometer-alt" style="color: white; font-family: 'Poppins', sans-serif;"></i>
               <p>Dashboard</p>
             </a>
           </li>
@@ -55,7 +55,7 @@
           <!-- Student Sidebar Links -->
           <li class="nav-item">
             <a href="{{ url('student/project/project/add') }}" class="nav-link @if(Request::segment(2) == 'project') active @endif" style="color: #EAEAEA;">
-              <i class="nav-icon fas fa-plus" style="color: white;"></i>
+              <i class="nav-icon fas fa-plus" style="color: white; "></i>
               Create a Project
             </a>
           </li>
@@ -143,6 +143,13 @@
   margin-top: 50px;
 }
 .p {
+  font-family: "Poppins", sans-serif;
+}
+.nav-item {
+  font-family: "Poppins", sans-serif;
+  
+}
+.a{
   font-family: "Poppins", sans-serif;
 }
 </style>

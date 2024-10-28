@@ -6,6 +6,8 @@
   <title>{{ !empty($header_title) ? $header_title : ''}} | Synco</title>
 
   <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{url ('assets/adminassets/plugins/fontawesome-free/css/all.min.css')}}">

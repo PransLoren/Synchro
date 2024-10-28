@@ -48,7 +48,7 @@
         Project Report
     </h1>
 
-    <div class="tabs" style="margin-left: 4rem; margin-bottom: 20px;">
+    <div class="tabs" style="margin-left:5rem; margin-bottom: 20px;">
         <a href="#project-list" class="tab active" data-tab="project-list">Project List</a>
         <a href="#overdue-projects" class="tab" data-tab="overdue-projects">Overdue Projects</a>
         <a href="#completed-projects" class="tab" data-tab="completed-projects">Completed Projects</a>
@@ -359,6 +359,9 @@
             $('#project-list-content').show(); 
         }
     });
+
+
+    
 </script>
 
 
@@ -395,9 +398,33 @@ html, body {
     width: 100%;
     margin-left: 5rem;
 }
+.tab {
+    font-family: "Poppins", sans-serif;
+    
+}
+.tabs .tab {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #748cab; /* Button background color */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px; /* Rounded corners */
+    margin-right: 10px;
+    font-weight: 400;
+    font-family: "Poppins", sans-serif;
+}
+
+.tabs .tab:hover {
+    background-color: #425673; /* Darker shade for hover effect */
+}
+
+.tabs .tab.active {
+    background-color: #2a3b54; /* Active tab color */
+}
 
 .create-btn:hover {
-    background-color: #95b9cd; 
+    background-color:#425673; 
     color: #fff; 
     text-decoration: none;
 } */
