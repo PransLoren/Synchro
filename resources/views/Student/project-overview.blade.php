@@ -83,5 +83,13 @@
     }
     .list-group{
         background-color: #425673;
+        color: grey !important;
     }
+    .list-group-item.active {
+    background-color: #b8c7dc !important;
+    border-color: #b8c7dc !important;
+    color: black !important; 
+    font-weight: 600 !important;
+}
+
 </style>

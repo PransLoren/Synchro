@@ -3,7 +3,6 @@
 @section('content')
 
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -11,16 +10,14 @@
                     <h1>Account Settings</h1>
                 </div>
             </div>
-        </div><!-- /.container-fluid -->
+        </div>
     </section>
 
-    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-primary">
-                        <!-- form start -->
                         <form action="{{ route('profile.update') }}" method="POST">
                             @csrf
                             <div class="card-body">
@@ -41,7 +38,6 @@
                                     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
                                 </div>
                             </div>
-                            <!-- /.card-body -->
 
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary">Update Profile</button>
@@ -56,3 +52,10 @@
 
 @endsection
 
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");
+
+    .content-wrapper, .content-wrapper h1, .content-wrapper p, .content-wrapper label, .content-wrapper input, .content-wrapper button {
+        font-family: "Poppins", sans-serif;
+    }
+</style>

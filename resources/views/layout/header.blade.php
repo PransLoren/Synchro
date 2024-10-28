@@ -11,7 +11,7 @@
     <!-- Sidebar user panel (optional) -->
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
       <div class="info">
-        <a href="#" class="d-block" style="color: #EAEAEA; font-family: 'Poppins', sans-serif;">Hi, {{ Auth::user()->name }}</a>
+        <a href="#" class="d-block" style="color: #EAEAEA; font-family: 'Poppins', sans-serif; margin-left:1rem;">Hi, {{ Auth::user()->name }}</a>
       </div>
     </div>
 
@@ -44,12 +44,12 @@
               <p>Project List</p>
             </a>
           </li>
-          <!-- <li class="nav-item">
+           <li class="nav-item">
             <a href="{{url ('student/profile')}}" class="nav-link @if(Request::segment(2) =='profile') active @endif" style="color: #EAEAEA;">
               <i class="nav-icon far fa-user" style="color: white;"></i>
               <p>Profile</p>
             </a>
-          </li> -->
+          </li>
 
         @elseif(Auth::user()->user_type == 3)
           <!-- Student Sidebar Links -->
@@ -84,12 +84,12 @@
             </a>
           </li>
 
-          <!-- <li class="nav-item">
+           <li class="nav-item">
             <a href="{{ route('student.profile') }}" class="nav-link @if(Request::segment(2) == 'profile') active @endif" style="color: #EAEAEA;">
               <i class="nav-icon far fa-user" style="color: white;"></i>
               <p>Profile</p>
             </a>
-          </li> -->
+          </li> 
 
           <li class="nav-item">
           <a href="{{ route('project.overview') }}" class="nav-link @if(Request::segment(3) == 'overview') active @endif" style="color: #EAEAEA;">
@@ -122,20 +122,48 @@
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");
 .nav-sidebar .nav-link.active {
-    background-color: red; /* Desired background color */
-    color: #EAEAEA; /* Text color */
+  background-color: #b8c7dc !important;
+  border-color: #b8c7dc !important;
+  color: black !important;
+  font-weight: 450 !important;
+}
+.nav-sidebar .nav-link.active .nav-icon.fas.fa-plus {
+  color: black !important; /* Change the icon color to black when active */
+}
+.nav-sidebar .nav-link.active .nav-icon.fas.fa-tachometer-alt,
+.nav-sidebar .nav-link.active .nav-icon.fas.fa-user,
+.nav-sidebar .nav-link.active .nav-icon.fas.fa-users,
+.nav-sidebar .nav-link.active .nav-icon.fas.fa-tasks,
+.nav-sidebar .nav-link.active .nav-icon.far.fa-user,
+.nav-sidebar .nav-link.active .nav-icon.fas.fa-list,
+.nav-sidebar .nav-link.active .nav-icon.fas.fa-envelope,
+.nav-sidebar .nav-link.active .nav-icon.fas.fa-sign-out-alt {
+  color: black !important; /* Change the icon color to black when active */
+}
+
+/* Default icon color when not active */
+.nav-icon.fas.fa-plus,
+.nav-icon.fas.fa-tachometer-alt,
+.nav-icon.fas.fa-user,
+.nav-icon.fas.fa-users,
+.nav-icon.fas.fa-tasks,
+.nav-icon.far.fa-user,
+.nav-icon.fas.fa-list,
+.nav-icon.fas.fa-envelope,
+.nav-icon.fas.fa-sign-out-alt {
+  color: white; /* Default color when not active */
 }
 .nav-sidebar .nav-item .nav-link.active {
-    background-color: red; /* Desired background color */
-    color: #EAEAEA; /* Text color */
+    background-color: red; 
+    color: #EAEAEA;
 }
 .nav.nav-pills.nav-sidebar.flex-column.nav-link.active {
-  background-color: red; /* Desired background color */
+  background-color: red; 
   color: #EAEAEA;
 }
 .nav-sidebar .nav-link:hover {
-    background-color: red; /* Hover color */
-    color: #EAEAEA; /* Hover text color */
+    background-color: red; 
+    color: #EAEAEA; 
 }
 .logo-home {
   height:150px;

@@ -1,22 +1,25 @@
 @extends('layout.app')
 @section('content')
 
-<!-- Content Wrapper. Contains page content -->
+
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
+
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0"></h1>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Notification and Profile -->
+ 
     <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid" style="display: flex; justify-content: flex-end; align-items: center;">
+        <!-- HERE YUNG SA HEADER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+    <div class="container-fluid" style="display: flex; justify-content: flex-end; align-items: center; box-shadow: 0 0 8px rgba(0, 0, 0, 0.10);
+    border-radius:10px; margin-bottom: 2rem; margin-top: -2rem; padding: 1rem;">
+
             <ul class="navbar-nav" style="display: flex; gap: 30px; align-items: center; margin-left: auto;">
                 <li class="nav-item dropdown" style="position: relative;">
                     <a class="nav-link" href="#" id="notificationDropdown" role="button"
@@ -36,7 +39,7 @@
                 <li class="nav-item">
                     <a href="{{ url('student/profile') }}"
                        class="up @if(Request::segment(2) == 'profile') active @endif"
-                       style="font-family: 'Poppins', sans-serif; background-color: white; color: #2e5caf; font-size: 18px;">
+                       style="font-family: 'Poppins', sans-serif;  color: #2e5caf; font-size: 18px; margin-right:4rem; text-decoration: none; text-transform: none;">
                         Profile
                     </a>
                 </li>
@@ -44,11 +47,11 @@
         </div>
     </nav>
 
-    <h1 class="report-title" style="margin-left:4rem; color:#2e5caf; font-size: 28px; font-family: 'Poppins', sans-serif;">
+    <h1 class="report-title" style="margin-left:5rem; color:#2e5caf; font-size: 28px; font-family: 'Poppins', sans-serif;">
         Project Report
     </h1>
 
-    <div class="tabs" style="margin-left:5rem; margin-bottom: 20px;">
+    <div class="tabs" style="margin-left:5rem; margin-bottom: 2rem; margin-top:1rem;">
         <a href="#project-list" class="tab active" data-tab="project-list">Project List</a>
         <a href="#overdue-projects" class="tab" data-tab="overdue-projects">Overdue Projects</a>
         <a href="#completed-projects" class="tab" data-tab="completed-projects">Completed Projects</a>
@@ -60,7 +63,7 @@
                 <div class="col-md-12">
                     @include('message')
 
-                    <!-- Project List Section -->
+
                     <div class="card" id="project-list-content">
                         <div class="card-header">
                             <h3 class="card-title">Project List</h3>
@@ -89,7 +92,6 @@
                                         <td>{{ $value->submission_date }}</td>
                                         <td>{{ $value->submission_time }}</td>
 
-                                        <!-- Conditionally Render Buttons Based on Creator -->
                                         <td>
                                             @if(auth()->id() == $value->created_by)
                                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taskModal{{ $value->id }}">
@@ -129,7 +131,6 @@
                         </div>
                     </div>
 
-                    <!-- Overdue and Completed Projects Sections -->
                     <div class="card" id="overdue-projects-content" style="display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Overdue Projects</h3>
@@ -223,7 +224,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Invite</button>
                 </form>
-                <!-- Display success or error message -->
+
                 <div id="inviteUserMessage{{ $value->id }}"></div>
             </div>
         </div>
@@ -231,7 +232,7 @@
 </div>
 @endforeach
 
-<!-- Task Modal -->
+
 @foreach($userProjects as $value)
 <div class="modal fade" id="taskModal{{ $value->id }}" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel{{ $value->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -261,7 +262,7 @@
                         <select class="form-control" id="assignedTo" name="assigned_to" required>
                             <option value="" disabled selected>Select User</option>
                             @foreach($value->users as $user)
-                                @if($user->id !== $value->created_by) <!-- Exclude creator of the project -->
+                                @if($user->id !== $value->created_by) 
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endif
                             @endforeach
@@ -269,7 +270,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Submit</button>
                 </form>
-                <!-- Display success or error message -->
+
                 <div id="taskMessage{{ $value->id }}"></div>
             </div>
         </div>
@@ -351,7 +352,7 @@
             $(this).addClass('active'); 
         });
 
-        // Ensure correct tab content is shown on page load
+
         const activeTabId = $('.tab.active').data('tab');
         if (activeTabId) {
             $(`#${activeTabId}-content`).show(); 
@@ -405,22 +406,22 @@ html, body {
 .tabs .tab {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #748cab; /* Button background color */
+    background-color: #748cab;
     color: white;
     text-align: center;
     text-decoration: none;
-    border-radius: 5px; /* Rounded corners */
+    border-radius: 5px; 
     margin-right: 10px;
     font-weight: 400;
     font-family: "Poppins", sans-serif;
 }
 
 .tabs .tab:hover {
-    background-color: #425673; /* Darker shade for hover effect */
+    background-color: #425673; 
 }
 
 .tabs .tab.active {
-    background-color: #2a3b54; /* Active tab color */
+    background-color: #2a3b54; 
 }
 
 .create-btn:hover {
@@ -431,15 +432,15 @@ html, body {
 /* header */
 .up{
     border-color: none;
-    
+    margin-left: 30px;
     padding: 8px;
     
 }
 .up:hover{
     border-color: none;
     text-decoration: none;
-    font-weight: 700;
-    border-radius: 1rem;
+    font-weight: 430;
+    
 }
 .info2 {
     margin: 4rem;
@@ -539,11 +540,15 @@ ul, ol, li {
     color: #ff4500; 
     
 }
-.btn.btn-success{
+.btn.btn-invite{
     background-color: #D98D36;
     border-color: #D98D36;
     font-size: 15px;
     height: 35px;
+}
+.btn.btn-invite:hover{
+    background-color: #f2b56f;
+    border-color: #f2b56f;
 }
 .btn.btn-warning {
     background-color: #95b9cd;
@@ -552,6 +557,10 @@ ul, ol, li {
     height: 30px;
     
 }
+.btn.btn-warning:hover{
+    background-color: #c1e2f5;
+    border-color: #c1e2f5;
+}
 .btn.btn-primary{
     background-color: #2e5caf;
     border-color: #2e5caf;
@@ -559,11 +568,11 @@ ul, ol, li {
     height: 30px;
 }
 
-/* Notification Dropdown */
+
 .notification-dropdown {
     width: 320px;
     max-height: 400px;
-    overflow-y: auto; /* Make the dropdown scrollable if content exceeds height */
+    overflow-y: auto; 
     padding: 10px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -577,7 +586,7 @@ ul, ol, li {
     text-align: left;
 }
 
-/* Each Notification Item */
+
 .dropdown-item {
     display: block;
     white-space: nowrap;
@@ -598,7 +607,7 @@ ul, ol, li {
     margin-top: 4px;
 }
 
-/* Footer Link */
+
 .dropdown-footer a {
     display: inline-block;
     margin-top: 8px;
@@ -611,7 +620,7 @@ ul, ol, li {
     text-decoration: underline;
 }
 
-/* Scrollbar Styling */
+
 .notification-dropdown::-webkit-scrollbar {
     width: 6px;
 }

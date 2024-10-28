@@ -88,10 +88,10 @@ form.sign-in-form {
 }
 @media (max-width: 870px) {
     .logo {
-        height: 15vw; /* Smaller height for smaller screens */
-        margin-left: auto; /* Center logo on smaller screens */
+        height: 15vw; 
+        margin-left: auto; 
         margin-right: auto;
-        margin-top: -5rem; /* Adjust top margin if needed */
+        margin-top: -5rem; 
     }
 }
 /* .input-field {
@@ -274,10 +274,10 @@ input:-webkit-autofill {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 .btnf1 {
-    position: absolute; /* Position relative to the container */
-    bottom: 38%; /* Adjust this value to position the button vertically */
+    position: absolute; 
+    bottom: 38%; 
     left: 45%;
-    transform: translateX(-50%); /* Center horizontally */
+    transform: translateX(-50%); 
     width: 320px;
     height: 55px;
     background-color: #435e77;
@@ -292,10 +292,10 @@ input:-webkit-autofill {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 .btnf2 {
-    position: absolute; /* Position relative to the container */
-    bottom: 50%; /* Adjust this value to position the button vertically */
+    position: absolute; 
+    bottom: 50%; 
     left: 15%;
-    transform: translateX(-50%); /* Center horizontally */
+    transform: translateX(-50%); 
     width: 320px;
     height: 55px;
     background-color: #737373;
@@ -303,17 +303,17 @@ input:-webkit-autofill {
     outline: none;
     font-family: "Poppins", sans-serif;
     border-radius: 30px;
-    color: #0f0f0f;
+    color: #fff;
     font-weight: 500;
     font-size: 15px;
     transition: 0.5s;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 .btnf3 {
-    position: absolute; /* Position relative to the container */
-    bottom: 5%; /* Adjust this value to position the button vertically */
+    position: absolute; 
+    bottom: 5%; 
     left: 15%;
-    transform: translateX(-50%); /* Center horizontally */
+    transform: translateX(-50%); 
     width: 350px;
     height: 55px;
     background-color: #d1cccc;
